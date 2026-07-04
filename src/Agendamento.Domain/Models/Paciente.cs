@@ -1,0 +1,28 @@
+﻿namespace Agendamento.Domain.Models;
+public class Paciente : Entity
+{
+    public string Nome { get; set; }
+    public DateOnly DataDeNascimento { get; set; }
+    public string CPF { get; set; }
+    public string RG { get; set; }
+    public string OrgaoEmissor { get; set; }
+    public StatusGenero StatusGenero { get; set; } 
+    public StatusEstadoCivil StatusEstadoCivil { get; set; } 
+    public StatusPaciente StatusPaciente { get; set; }
+    public Endereco Endereco { get; set; } 
+    public Contato Contato { get; set; }
+
+    public Paciente(string nome, DateOnly dataDeNascimento, string cpf, string rg, string orgaoEmissor, StatusGenero statusGenero, StatusEstadoCivil statusEstadoCivil, StatusPaciente statusPaciente, Endereco endereco, Contato contato)
+    {
+        Nome = nome;
+        DataDeNascimento = dataDeNascimento;
+        CPF = cpf;
+        RG = rg;
+        OrgaoEmissor = orgaoEmissor;
+        StatusGenero = statusGenero;
+        StatusEstadoCivil = statusEstadoCivil;
+        StatusPaciente = statusPaciente;
+        Endereco = endereco;
+        Contato = contato;
+    }
+}
