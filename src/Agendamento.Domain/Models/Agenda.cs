@@ -1,6 +1,6 @@
 ﻿namespace Agendamento.Domain.Models;
 
-public class Agendamento : Entity
+public class Agenda : Entity
 {
     public Guid PacienteId { get; set; }
     public Guid ProfissionalId { get; set; }
@@ -11,7 +11,7 @@ public class Agendamento : Entity
     public Paciente Paciente { get; private set; }
     public Profissional Profissional { get; private set; }
 
-    public Agendamento(Guid pacienteId, Guid profissionalId, StatusAgendamento statusAgendamento, DateTime dataInicio, DateTime dataFim, string observacao, Paciente paciente, Profissional profissional)
+    public Agenda(Guid pacienteId, Guid profissionalId, StatusAgendamento statusAgendamento, DateTime dataInicio, DateTime dataFim, string observacao, Paciente paciente, Profissional profissional)
     {
         PacienteId = pacienteId;
         ProfissionalId = profissionalId;

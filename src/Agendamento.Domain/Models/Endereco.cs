@@ -7,8 +7,9 @@ public class Endereco
     public string Cidade { get; set; }
     public string UF { get; set; }
     public string Complemento { get; set; }
+    public string CEP { get; set; }
 
-    public Endereco(string logradouro, string numero, string bairro, string cidade, string uf, string complemento)
+    public Endereco(string logradouro, string numero, string bairro, string cidade, string uf, string complemento, string CEP)
     {
         Logradouro = logradouro;
         Numero = numero;
@@ -16,5 +17,6 @@ public class Endereco
         Cidade = cidade;
         UF = uf;
         Complemento = complemento;
+        CEP = complemento;
     }
 }
