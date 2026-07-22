@@ -11,7 +11,7 @@ public class Agenda : Entity
     public Paciente Paciente { get; private set; }
     public Profissional Profissional { get; private set; }
 
-    public Agenda(Guid pacienteId, Guid profissionalId, StatusAgendamento statusAgendamento, DateTime dataInicio, DateTime dataFim, string observacao, Paciente paciente, Profissional profissional)
+    public Agenda(Guid pacienteId, Guid profissionalId, StatusAgendamento statusAgendamento, DateTime dataInicio, DateTime dataFim, string? observacao, Paciente paciente, Profissional profissional)
     {
         PacienteId = pacienteId;
         ProfissionalId = profissionalId;

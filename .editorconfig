@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0160: Converter para bloquear o namespace com escopo
+csharp_style_namespace_declarations = file_scoped

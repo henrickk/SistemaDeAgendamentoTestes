@@ -4,13 +4,13 @@ namespace Agendamento.Domain.Interfaces;
 
 public interface IAgendaRepository : IRepository<Agenda>
 {
-    Task AdicionarAsync(Agenda agenda);
+    Task<Agenda> Adicionar(Agenda agenda);
 
-    Task<bool> ExisteConflitoHorarioAsync(
+    Task<bool> ExisteConflitoHorario(
         Guid profissionalId,
         DateTime dataInicio,
         DateTime dataFim);
 
-    Task<List<Agenda>> ObterAgendamentosPorProfissionalAsync(Guid profissionalId);
+    Task<List<Agenda>> ObterAgendamentosPorProfissional(Guid profissionalId);
 
 }
