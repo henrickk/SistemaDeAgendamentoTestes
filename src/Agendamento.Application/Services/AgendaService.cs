@@ -27,23 +27,33 @@ public class AgendaService : BaseService, IAgendaService
         await _agendaRepository.Adicionar(agendamento);
     }
 
-    public Task CancelarAgendamento(Guid agendamentoId)
+    public async Task CancelarAgendamento(Guid agendamentoId)
     {
-        throw new NotImplementedException();
+        await _agendaRepository.Remover(agendamentoId);
     }
 
     public Task ConcluirAgendamento(Guid agendamentoId)
     {
+        // Criar uma regra de negócio para concluir o agendamento, por exemplo, verificar se o agendamento está no status correto antes de concluir.
+
+        //if (StatusAgendamento.Agendado == StatusAgendamento.Concluido)
+        //if()
+        //{
+        //    agendamentoId = agendamentoId;
+        //}
         throw new NotImplementedException();
     }
 
     public Task ConfirmarAgendamento(Guid agendamentoId)
     {
+        // Criar uma regra de negócio para confirmar o agendamento, por exemplo, verificar se o agendamento está no status correto antes de confirmar.
         throw new NotImplementedException();
     }
 
     public void Dispose()
     {
+        _agendaRepository.Dispose();
+
         throw new NotImplementedException();
     }
 }
