@@ -7,13 +7,37 @@ namespace Agendamento.Application.Services;
 public class AgendaService : BaseService, IAgendaService
 {
     private readonly IAgendaRepository _agendaRepository;
-    public AgendaService(INotificador notificador, IAgendaRepository agendaRepository) : base(notificador)
+    private readonly IPacienteRepository _pacienteRepository;
+    private readonly IProfissionalRepository _profissionalRepository;
+    public AgendaService(INotificador notificador,
+                         IAgendaRepository agendaRepository,
+                         IPacienteRepository pacienteRepository,
+                         IProfissionalRepository profissionalRepository) : base(notificador
+        )
     {
         _agendaRepository = agendaRepository;
+        _pacienteRepository = pacienteRepository;
+        _profissionalRepository = profissionalRepository;
     }
 
     public async Task Agendar(NovoAgendamentoDto novoAgendamentoDto)
     {
+        var paciente = await _pacienteRepository.ObterPorId(novoAgendamentoDto.PacienteId);
+
+        if (paciente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        var profissional = await _profissionalRepository.ObterPorId(novoAgendamentoDto.ProfissionalId);
+        
+        if (profissional == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return;
+        }
+
         var agendamento = new Agenda(
         novoAgendamentoDto.PacienteId,
         novoAgendamentoDto.ProfissionalId,

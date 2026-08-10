@@ -1,4 +1,6 @@
-﻿namespace Agendamento.Application.Interfaces;
+﻿using Agendamento.Application.DTOs;
+
+namespace Agendamento.Application.Interfaces;
 
 public interface IContatoService : IDisposable
 {
