@@ -6,10 +6,6 @@ namespace Agendamento.Infrastructure.Repository;
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity, new()
 {
 
-    //protected Repository(DbContext db)
-    //{
-
-    //}
     public Task Adicionar(TEntity entity)
     {
         throw new NotImplementedException();

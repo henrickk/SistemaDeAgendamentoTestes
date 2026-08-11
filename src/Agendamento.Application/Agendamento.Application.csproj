@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Agendamento.Domain\Agendamento.Domain.csproj" />
+    <ProjectReference Include="..\Agendamento.Infrastructure\Agendamento.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

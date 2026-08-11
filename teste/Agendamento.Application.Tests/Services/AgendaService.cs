@@ -2,7 +2,6 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Agendamento.Infrastructure.Context;
 
 namespace Agendamento.Application.Services;
 public class AgendaService : BaseService, IAgendaService
@@ -10,18 +9,15 @@ public class AgendaService : BaseService, IAgendaService
     private readonly IAgendaRepository _agendaRepository;
     private readonly IPacienteRepository _pacienteRepository;
     private readonly IProfissionalRepository _profissionalRepository;
-    private readonly Context _context; 
     public AgendaService(INotificador notificador,
                          IAgendaRepository agendaRepository,
                          IPacienteRepository pacienteRepository,
-                         IProfissionalRepository profissionalRepository,
-                         Context context) : base(notificador
+                         IProfissionalRepository profissionalRepository) : base(notificador
         )
     {
         _agendaRepository = agendaRepository;
         _pacienteRepository = pacienteRepository;
         _profissionalRepository = profissionalRepository;
-        _context = context;
     }
 
     public async Task Agendar(NovoAgendamentoDto novoAgendamentoDto)
