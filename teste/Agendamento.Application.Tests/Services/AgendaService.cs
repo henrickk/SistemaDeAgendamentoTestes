@@ -74,7 +74,22 @@ public class AgendaService : BaseService, IAgendaService
 
     public async Task CancelarAgendamento(Guid agendamentoId)
     {
-        await _agendaRepository.Remover(agendamentoId);
+        var agendamento = await _agendaRepository.ObterPorId(agendamentoId);
+
+        if (agendamento == null)
+        {
+            Notificar("Agendamento não encontrado.");
+            return;
+        }
+
+        if (agendamento.StatusAgendamento == StatusAgendamento.Cancelado)
+        {
+            Notificar("O agendamento já está cancelado.");
+            return;
+        }
+
+        agendamento.StatusAgendamento = StatusAgendamento.Cancelado;
+        await _agendaRepository.Atualizar(agendamento);
     }
 
     public Task ConcluirAgendamento(Guid agendamentoId)
