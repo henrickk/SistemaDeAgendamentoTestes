@@ -2,7 +2,6 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Agendamento.Infrastructure.Context;
 
 namespace Agendamento.Application.Services;
 public class AgendaService : BaseService, IAgendaService
@@ -10,18 +9,15 @@ public class AgendaService : BaseService, IAgendaService
     private readonly IAgendaRepository _agendaRepository;
     private readonly IPacienteRepository _pacienteRepository;
     private readonly IProfissionalRepository _profissionalRepository;
-    private readonly Context _context; 
     public AgendaService(INotificador notificador,
                          IAgendaRepository agendaRepository,
                          IPacienteRepository pacienteRepository,
-                         IProfissionalRepository profissionalRepository,
-                         Context context) : base(notificador
+                         IProfissionalRepository profissionalRepository) : base(notificador
         )
     {
         _agendaRepository = agendaRepository;
         _pacienteRepository = pacienteRepository;
         _profissionalRepository = profissionalRepository;
-        _context = context;
     }
 
     public async Task Agendar(NovoAgendamentoDto novoAgendamentoDto)
@@ -78,25 +74,83 @@ public class AgendaService : BaseService, IAgendaService
 
     public async Task CancelarAgendamento(Guid agendamentoId)
     {
-        await _agendaRepository.Remover(agendamentoId);
+        var agendamento = await _agendaRepository.ObterPorId(agendamentoId);
+
+        if (agendamento == null)
+        {
+            Notificar("Agendamento não encontrado.");
+            return;
+        }
+
+        if (agendamento.StatusAgendamento == StatusAgendamento.Cancelado)
+        {
+            Notificar("O agendamento já está cancelado.");
+            return;
+        }
+
+        agendamento.StatusAgendamento = StatusAgendamento.Cancelado;
+        await _agendaRepository.Atualizar(agendamento);
     }
 
-    public Task ConcluirAgendamento(Guid agendamentoId)
+    public async Task ConcluirAgendamento(Guid agendamentoId)
     {
-        // Criar uma regra de negócio para concluir o agendamento, por exemplo, verificar se o agendamento está no status correto antes de concluir.
-
-        //if (StatusAgendamento.Agendado == StatusAgendamento.Concluido)
-        //if()
-        //{
-        //    agendamentoId = agendamentoId;
-        //}
-        throw new NotImplementedException();
+        var agendamento = await _agendaRepository.ObterPorId(agendamentoId);
+        if (agendamento == null)
+        {
+            Notificar("Agendamento não encontrado.");
+            return;
+        }
+        if (agendamento.StatusAgendamento == StatusAgendamento.Concluido)
+        {
+            Notificar("O agendamento já está concluído.");
+            return;
+        }
+        agendamento.StatusAgendamento = StatusAgendamento.Concluido;
+        await _agendaRepository.Atualizar(agendamento);
     }
 
-    public Task ConfirmarAgendamento(Guid agendamentoId)
+    public async Task ConfirmarAgendamento(Guid agendamentoId)
     {
-        // Criar uma regra de negócio para confirmar o agendamento, por exemplo, verificar se o agendamento está no status correto antes de confirmar.
-        throw new NotImplementedException();
+        var agendamento = await _agendaRepository.ObterPorId(agendamentoId);
+
+        // Verificar se agendamento existe
+        if (agendamento == null)
+        {
+            Notificar("Agendamento não encontrado.");
+            return;
+        }
+
+        if (agendamento.StatusAgendamento == StatusAgendamento.Agendado)
+        {
+            agendamento.StatusAgendamento = StatusAgendamento.Confirmado; // Corrigido para alterar o status diretamente
+            await _agendaRepository.Atualizar(agendamento);
+            return;
+        }
+
+        var paciente = await _pacienteRepository.ObterPorId(agendamento.PacienteId);
+
+        if (paciente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        // verificar se o agendamento já está confirmado
+        if (agendamento.StatusAgendamento == StatusAgendamento.Confirmado)
+        {
+            Notificar("O agendamento já está confirmado.");
+            return;
+        }
+
+        // verificar se o paciente está bloqueado
+        if (paciente.StatusPaciente == StatusPaciente.Bloqueado)
+        {
+            Notificar("Paciente bloqueado. Não é possível confirmar agendamento.");
+            return;
+        }
+
+        agendamento.StatusAgendamento = StatusAgendamento.Confirmado; // Corrigido para alterar o status diretamente
+        await _agendaRepository.Atualizar(agendamento);
     }
 
     public void Dispose()
