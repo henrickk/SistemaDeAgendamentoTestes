@@ -112,10 +112,9 @@ public class AgendaTests
         // 🟢 PASSO CHAVE: Criar e mockar um paciente válido para passar da primeira validação
         var pacienteValido = new Paciente(
             nome: "Paciente Teste",
-            dataDeNascimento: new DateOnly(1990, 1, 1),
+            dataNascimento: new DateOnly(1990, 1, 1),
             cpf: "12345678901",
             rg: "1234567",
-            orgaoEmissor: "SSP",
             statusGenero: StatusGenero.Masculino,
             statusEstadoCivil: StatusEstadoCivil.Solteiro,
             statusPaciente: StatusPaciente.Ativo,
@@ -155,10 +154,9 @@ public class AgendaTests
         // Criando um paciente fake preenchendo todos os 10 parâmetros obrigatórios
         var pacienteBloqueado = new Paciente(
             nome: "Paciente Teste",
-            dataDeNascimento: new DateOnly(1990, 1, 1),
+            dataNascimento: new DateOnly(1990, 1, 1),
             cpf: "12345678901",
             rg: "1234567",
-            orgaoEmissor: "SSP",
             statusGenero: StatusGenero.Masculino, // Ajuste para um enum válido seu
             statusEstadoCivil: StatusEstadoCivil.Solteiro, // Ajuste para um enum válido seu
             statusPaciente: StatusPaciente.Bloqueado, // O ponto chave do teste está aqui!

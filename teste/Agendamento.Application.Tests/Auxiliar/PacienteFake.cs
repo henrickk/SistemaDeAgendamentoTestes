@@ -2,10 +2,8 @@
 
 namespace Agendamento.Application.Tests.Services.Auxiliar;
 
-// 🟢 Adicione a definição da classe como public e static
 public static class PacienteFixture
 {
-    // 🟢 Mude de private para public e adicione static
     public static Paciente CriarPacienteFake(StatusPaciente status = StatusPaciente.Ativo)
     {
         return new Paciente(
@@ -13,7 +11,6 @@ public static class PacienteFixture
             new DateOnly(2000, 1, 1),
             "00000000000",
             "0000000",
-            "SSP",
             StatusGenero.Masculino,
             StatusEstadoCivil.Solteiro,
             status,

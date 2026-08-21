@@ -10,7 +10,7 @@ public class PacienteValidation : AbstractValidator<Paciente>
             .NotEmpty().WithMessage("O nome do paciente é obrigatório.")
             .MaximumLength(100).WithMessage("O nome do paciente não pode exceder 100 caracteres.");
         
-        RuleFor(p => p.DataDeNascimento)
+        RuleFor(p => p.DataNascimento)
             .NotEmpty().WithMessage("A data de nascimento é obrigatória.")
             .LessThan(DateOnly.FromDateTime(DateTime.Now)).WithMessage("A data de nascimento deve ser anterior à data atual.");
 
