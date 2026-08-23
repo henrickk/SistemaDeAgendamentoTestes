@@ -1,6 +1,6 @@
 ﻿namespace Agendamento.Domain.Models;
 
-public class Contato
+public class Contato : Entity
 {
     public string Email { get; set; }
     public string NumeroCelular { get; set; }

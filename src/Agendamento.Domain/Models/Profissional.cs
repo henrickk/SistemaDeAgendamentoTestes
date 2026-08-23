@@ -10,7 +10,9 @@ public class Profissional : Entity
     public Contato Contato { get; set; }
     public Endereco Endereco { get; set; }
 
-    public Profissional(string nome, DateOnly dateOnly, string cro, string v, string v1, Contato contato, TimeOnly horaInicio, TimeOnly horaFim, string cpf, Endereco endereco )
+    protected Profissional() { }
+
+    public Profissional(string nome, DateOnly dateOnly, string cro, string v, string v1, Contato contato, TimeOnly horaInicio, TimeOnly horaFim, string cpf, Endereco endereco)
     {
         Nome = nome;
         CRO = cro;

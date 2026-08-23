@@ -3,11 +3,10 @@ using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Infrastructure.Context;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Agendamento.API.Controllers;
 [ApiController]
-[Route("[controller]")]
+[Route("api/agenda")]
 public class AgendaController : ControllerBase
 {
     private readonly INotificador _notificador;
@@ -16,7 +15,7 @@ public class AgendaController : ControllerBase
     private readonly IAgendaRepository _agendaRepository;
     private readonly IPacienteRepository _pacienteRepository;
     private readonly IProfissionalRepository _profissionalRepository;
-    private readonly Context _context;
+    private readonly MeuDbContext _context;
 
     public AgendaController(INotificador notificador,
                             ILogger<AgendaController> logger,
@@ -24,7 +23,7 @@ public class AgendaController : ControllerBase
                             IAgendaRepository agendaRepository,
                             IPacienteRepository pacienteRepository,
                             IProfissionalRepository profissionalRepository,
-                            Context context)
+                            MeuDbContext context)
     {
         _notificador = notificador;
         _logger = logger;
@@ -36,6 +35,7 @@ public class AgendaController : ControllerBase
     }
 
     [HttpGet]
+    [Route("consultar-agendamentos")]
     public async Task<ActionResult<IEnumerable<Agenda>>> ObterTodosAgendamentos()
     {
         var agendamentos = await _agendaRepository.ObterTodos();
@@ -44,6 +44,7 @@ public class AgendaController : ControllerBase
     }
 
     [HttpGet]
+    [Route("consultar-agendamento/{id:guid}")]
     public async Task<ActionResult<Agenda>> ObterAgendamentoPorId(int id)
     {
         var agendamento = await _context.Agendas.FindAsync(id);

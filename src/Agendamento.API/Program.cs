@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 // CONFIGURAÇÃO DO ENTITY FRAMEWORK (Adicionado aqui)
-builder.Services.AddDbContext<Context>(options =>
+builder.Services.AddDbContext<MeuDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();

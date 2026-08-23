@@ -11,6 +11,8 @@ public class Paciente : Entity
     public Endereco Endereco { get; set; }
     public Contato Contato { get; set; }
 
+    protected Paciente() { }
+
     public Paciente(string nome, DateOnly dataNascimento, string cpf, string rg, StatusGenero statusGenero, StatusEstadoCivil statusEstadoCivil, StatusPaciente statusPaciente, Endereco endereco, Contato contato)
     {
         Nome = nome;
@@ -23,4 +25,5 @@ public class Paciente : Entity
         Endereco = endereco;
         Contato = contato;
     }
+
 }
