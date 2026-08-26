@@ -57,7 +57,8 @@ public class AgendaController : MainController
 
         if (agendamento == null)
         {
-            return NotFound(new { message = "Agendamento não encontrado." });
+            NotificarErro("Agendamento não encontrado.");
+            return CustomResponse(ModelState);
         }
 
         return Ok(agendamento);
@@ -67,13 +68,36 @@ public class AgendaController : MainController
     [Route("agendar-consulta")]
     public async Task<ActionResult<Agenda>> AgendarNovaConsulta(NovoAgendamentoDto novoAgendamentoDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return CustomResponse(ModelState);
-        }
+        if (!ModelState.IsValid) return CustomResponse(ModelState);
 
         await _agendaService.Agendar(novoAgendamentoDto);
 
         return CustomResponse(HttpStatusCode.Created, novoAgendamentoDto);
     }
+
+    [HttpPut]
+    [Route("Atualizar/{agendamentoId:guid}")]
+    public async Task<ActionResult> AtualizarAgendamento(Guid agendamentoId, [FromBody] AtualizarAgendamentoDto atualizarAgendamentoDto)
+    {
+        if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+        var agendamentoExistente = await _agendaRepository.ObterPorId(agendamentoId);
+        if (agendamentoExistente == null)
+        {
+            NotificarErro("Agendamento não encontrado.");
+            return CustomResponse();
+        }
+
+        agendamentoExistente.DataInicio = atualizarAgendamentoDto.DataInicio;
+        agendamentoExistente.DataFim = atualizarAgendamentoDto.DataFim;
+        agendamentoExistente.Observacao = atualizarAgendamentoDto.Observacao;
+        agendamentoExistente.ProfissionalId = atualizarAgendamentoDto.ProfissionalId;
+        agendamentoExistente.StatusAgendamento = atualizarAgendamentoDto.StatusAgendamento;
+
+        await _agendaRepository.Atualizar(agendamentoExistente);
+        return CustomResponse(HttpStatusCode.NoContent);
+    }
+
+    //[HttpPut]
+    //[Route("confirmar-agendamento/{agendamentoId:guid}")]
 }
