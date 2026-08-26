@@ -3,8 +3,8 @@ using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Infrastructure.Context;
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Agendamento.API.Controllers;
@@ -100,4 +100,21 @@ public class AgendaController : MainController
 
     //[HttpPut]
     //[Route("confirmar-agendamento/{agendamentoId:guid}")]
+
+    [HttpDelete]
+    [Route("cancelar-agendamento/{agendamentoId:guid}")]
+    public async Task<ActionResult> CancelarAgendamento(Guid agendamentoId)
+    {
+        var agendamentoExistente = await _agendaRepository.ObterPorId(agendamentoId);
+
+        if (agendamentoExistente == null)
+        {
+            NotificarErro("Agendamento não encontrado.");
+            return CustomResponse();
+        }
+
+        await _agendaService.CancelarAgendamento(agendamentoId);
+
+        return CustomResponse();
+    }
 }
