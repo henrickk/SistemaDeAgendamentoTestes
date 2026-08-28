@@ -1,42 +1,48 @@
 ﻿using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
+using Agendamento.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Agendamento.Infrastructure.Repository;
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity, new()
 {
+    protected readonly MeuDbContext meuDbContext;
+    protected readonly DbSet<TEntity> DbSet;
 
-    public Task Adicionar(TEntity entity)
+    public async Task<IEnumerable<TEntity>> Buscar(Expression<Func<TEntity, bool>> predicate)
     {
-        throw new NotImplementedException();
+        return await DbSet.AsNoTracking().Where(predicate).ToListAsync();
     }
-    public Task Atualizar(TEntity entity)
+    public async Task<TEntity> ObterPorId(Guid id)
     {
-        throw new NotImplementedException();
+        return await DbSet.FindAsync(id);
     }
-    public Task Remover(Guid id)
+    public async Task<List<TEntity>> ObterTodos()
     {
-        throw new NotImplementedException();
+        return await DbSet.ToListAsync();
     }
-    public Task<IEnumerable<TEntity>> Buscar(Expression<Func<TEntity, bool>> predicate)
+    public async Task Adicionar(TEntity entity)
     {
-        throw new NotImplementedException();
+        DbSet.Add(entity);
+        await SaveChanges();
     }
-    public Task<TEntity> ObterPorId(Guid id)
+    public async Task Atualizar(TEntity entity)
     {
-        throw new NotImplementedException();
+        DbSet.Update(entity);
+        await SaveChanges();
     }
-
-    public Task<List<TEntity>> ObterTodos()
+    public virtual async Task Remover(Guid id)
     {
-        throw new NotImplementedException();
+        DbSet.Remove(new TEntity { Id = id });
+        await SaveChanges();
     }
-    public Task<int> SaveChanges()
+    public async Task<int> SaveChanges()
     {
-        throw new NotImplementedException();
+        return await meuDbContext.SaveChangesAsync();
     }
     public void Dispose()
     {
-        throw new NotImplementedException();
+        meuDbContext.Dispose();
     }
 }

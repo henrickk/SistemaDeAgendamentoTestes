@@ -1,74 +1,78 @@
 ﻿using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Agendamento.Infrastructure.Repository;
 public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
 {
-    public PacienteRepository(MeuDbContext context) : base(context) { }
-    
-    public async Task Adicionar(Paciente entity)
+    private readonly MeuDbContext _dbContext;
+    public PacienteRepository(MeuDbContext dbContext)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task Atualizar(Paciente entity)
-    {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
     }
 
     public Task<IEnumerable<Paciente>> Buscar(Expression<Func<Paciente, bool>> predicate)
     {
         return Task.FromResult<IEnumerable<Paciente>>(new List<Paciente>());
     }
-
-    public Task<List<Paciente>> ObterPacientesPorNome(string nome)
+    public async Task<Paciente> ObterPorId(Guid id)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+    public async Task<List<Paciente>> ObterTodos()
+    {
+        return await _dbContext.Pacientes.AsNoTracking().ToListAsync();
     }
 
-    public Task<Paciente> ObterPorCPF(string cpf)
+    public async Task<List<Paciente>> ObterPacientesPorNome(string nome)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .Where(p => p.Nome.Contains(nome))
+            .ToListAsync();
     }
 
-    public Task<Paciente> ObterPorEmail(string email)
+    public async Task<Paciente> ObterPorCPF(string cpf)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.CPF == cpf);
     }
 
-    public Task<Paciente> ObterPorId(Guid id)
+    public async Task<Paciente> ObterPorEmail(string email)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Contato.Email == email);
     }
 
-    public Task<Paciente> ObterPorTelefone(string telefone)
+    public async Task<Paciente> ObterPorTelefone(string telefone)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Contato.NumeroCelular== telefone);
     }
 
-    public Task<List<Paciente>> ObterTodos()
+    public void Adicionar(Paciente paciente)
     {
-        throw new NotImplementedException();
+        _dbContext.Pacientes.Add(paciente);
     }
 
-    public Task<List<Paciente>> ObterTodosPacientes()
+    public void Atualizar(Paciente paciente)
     {
-        throw new NotImplementedException();
+        _dbContext.Pacientes.Update(paciente);
     }
 
-    public Task Remover(Guid id)
+    public void Remover(Guid id)
     {
-        throw new NotImplementedException();
+        //_dbContext.Pacientes.Remove(id); Erro chato
     }
 
-    public Task<int> SaveChanges()
+    public async Task<int> SaveChanges()
     {
-        throw new NotImplementedException();
+        return await _dbContext.SaveChangesAsync();
     }
     public void Dispose()
     {
-        throw new NotImplementedException();
+        _dbContext?.Dispose();
     }
 }

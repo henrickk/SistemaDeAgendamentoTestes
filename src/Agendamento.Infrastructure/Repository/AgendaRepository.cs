@@ -15,7 +15,7 @@ public class AgendaRepository : Repository<Agenda>, IAgendaRepository
     public async Task Adicionar(Agenda agenda)
     {
         await _context.Set<Agenda>().AddAsync(agenda);
-        await _context.SaveChangesAsync();''
+        await _context.SaveChangesAsync();
     }
 
     public async Task<bool> VerificarConflitoProfissional(Guid profissionalId, DateTime inicio, DateTime fim)
