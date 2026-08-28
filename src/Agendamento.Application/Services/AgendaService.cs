@@ -12,8 +12,7 @@ public class AgendaService : BaseService, IAgendaService
     public AgendaService(INotificador notificador,
                          IAgendaRepository agendaRepository,
                          IPacienteRepository pacienteRepository,
-                         IProfissionalRepository profissionalRepository) : base(notificador
-        )
+                         IProfissionalRepository profissionalRepository) : base(notificador)
     {
         _agendaRepository = agendaRepository;
         _pacienteRepository = pacienteRepository;

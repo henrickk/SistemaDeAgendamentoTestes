@@ -3,6 +3,7 @@
 namespace Agendamento.Application.DTOs;
 public class AtualizarPacienteDto
 {
+    public Guid Id { get; set; }
     public string Nome { get; set; }
     public DateOnly DataDeNascimento { get; set; }
     public string OrgaoEmissor { get; set; }
