@@ -26,13 +26,18 @@ public class AgendaRepository : Repository<Agenda>, IAgendaRepository
                            && fim > a.DataInicio);
     }
 
-    public Task<bool> ExisteConflitoHorario(Guid profissionalId, DateTime dataInicio, DateTime dataFim)
+    public async Task<bool> ExisteConflitoHorario(Guid profissionalId, DateTime dataInicio, DateTime dataFim)
     {
-        throw new NotImplementedException();
+        return await _context.Set<Agenda>()
+            .AnyAsync(a => a.ProfissionalId == profissionalId
+                           && dataInicio < a.DataFim
+                           && dataFim > a.DataInicio);
     }
 
-    public Task<List<Agenda>> ObterAgendamentosPorProfissional(Guid profissionalId)
+    public async Task<List<Agenda>> ObterAgendamentosPorProfissional(Guid profissionalId)
     {
-        throw new NotImplementedException();
+        return await _context.Set<Agenda>()
+            .Where(a => a.ProfissionalId == profissionalId)
+            .ToListAsync();
     }
 }

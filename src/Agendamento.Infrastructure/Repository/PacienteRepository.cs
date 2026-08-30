@@ -13,15 +13,17 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
         _dbContext = dbContext;
     }
 
-    public Task<IEnumerable<Paciente>> Buscar(Expression<Func<Paciente, bool>> predicate)
+    public async Task<IEnumerable<Paciente>> Buscar(Expression<Func<Paciente, bool>> predicate)
     {
-        return Task.FromResult<IEnumerable<Paciente>>(new List<Paciente>());
+        return await Task.FromResult(_dbContext.Pacientes.AsNoTracking().Where(predicate).ToList());
     }
+
     public async Task<Paciente> ObterPorId(Guid id)
     {
         return await _dbContext.Pacientes.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id);
     }
+
     public async Task<List<Paciente>> ObterTodos()
     {
         return await _dbContext.Pacientes.AsNoTracking().ToListAsync();
@@ -49,28 +51,34 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
     public async Task<Paciente> ObterPorTelefone(string telefone)
     {
         return await _dbContext.Pacientes.AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Contato.NumeroCelular== telefone);
+            .FirstOrDefaultAsync(p => p.Contato.NumeroCelular == telefone);
     }
 
-    public void Adicionar(Paciente paciente)
+    public async Task Adicionar(Paciente paciente)
     {
-        _dbContext.Pacientes.Add(paciente);
+        await _dbContext.Pacientes.AddAsync(paciente);
     }
 
-    public void Atualizar(Paciente paciente)
+    public async Task Atualizar(Paciente paciente)
     {
         _dbContext.Pacientes.Update(paciente);
+        await Task.CompletedTask;
     }
 
-    public void Remover(Guid id)
+    public async Task Remover(Guid id)
     {
-        //_dbContext.Pacientes.Remove(id); Erro chato
+        var paciente = await ObterPorId(id);
+        if (paciente != null)
+        {
+            _dbContext.Pacientes.Remove(paciente);
+        }
     }
 
     public async Task<int> SaveChanges()
     {
         return await _dbContext.SaveChangesAsync();
     }
+
     public void Dispose()
     {
         _dbContext?.Dispose();

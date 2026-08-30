@@ -2,7 +2,6 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Agendamento.Domain.Models.Validations;
 
 namespace Agendamento.Application.Services;
 public class PacienteService : BaseService, IPacienteService
@@ -25,27 +24,78 @@ public class PacienteService : BaseService, IPacienteService
     }
     public async Task Atualizar(AtualizarPacienteDto atualizarPacienteDto)
     {
-        var paciente = new Paciente(atualizarPacienteDto.Nome, atualizarPacienteDto.DataDeNascimento, atualizarPacienteDto.StatusGenero,
-                                    atualizarPacienteDto.StatusEstadoCivil, atualizarPacienteDto.StatusPaciente, atualizarPacienteDto.Endereco, atualizarPacienteDto.Contato);
+        if (atualizarPacienteDto == null)
+        {
+            Notificar("Os dados para atualização não podem ser nulos.");
+            return;
+        }
 
+        var pacienteExistente = await _pacienteRepository.Buscar(p => p.Id == atualizarPacienteDto.Id);
+
+        if (pacienteExistente == null || !pacienteExistente.Any())
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        var paciente = pacienteExistente.First();
+        paciente.Nome = atualizarPacienteDto.Nome;
+        paciente.DataNascimento = atualizarPacienteDto.DataDeNascimento;
+        paciente.StatusGenero = atualizarPacienteDto.StatusGenero;
+        paciente.StatusEstadoCivil = atualizarPacienteDto.StatusEstadoCivil;
+        paciente.StatusPaciente = atualizarPacienteDto.StatusPaciente;
+        paciente.Endereco = atualizarPacienteDto.Endereco;
+        paciente.Contato = atualizarPacienteDto.Contato;
+
+        await _pacienteRepository.Atualizar(paciente);
     }
 
-    public Task Bloquear(Guid id)
+    public async Task Bloquear(Guid id)
     {
-        throw new NotImplementedException();
+        var pacienteExistente = await _pacienteRepository.ObterPorId(id);
+        if (pacienteExistente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        pacienteExistente.StatusPaciente = StatusPaciente.Bloqueado;
+
+        await _pacienteRepository.Atualizar(pacienteExistente);
     }
-    public Task Remover(Guid id)
+    public async Task Remover(Guid id)
     {
-        throw new NotImplementedException();
+        var pacienteExistente = await _pacienteRepository.ObterPorId(id);
+
+        if (pacienteExistente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        await _pacienteRepository.Remover(id);
     }
 
     public async Task Ativar(Guid id)
     {
-        throw new NotImplementedException();
+        var pacineteExistente = await _pacienteRepository.ObterPorId(id);
+
+        pacineteExistente.StatusPaciente = StatusPaciente.Ativo;
+
+        await _pacienteRepository.Atualizar(pacineteExistente);
+    }
+
+    public async Task Desativar(Guid id)
+    {
+        var pacineteExistente = await _pacienteRepository.ObterPorId(id);
+
+        pacineteExistente.StatusPaciente = StatusPaciente.Inativo;
+
+        await _pacienteRepository.Atualizar(pacineteExistente);
     }
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        _pacienteRepository?.Dispose();
     }
 }

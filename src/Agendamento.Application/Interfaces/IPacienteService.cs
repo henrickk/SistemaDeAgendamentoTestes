@@ -8,4 +8,5 @@ public interface IPacienteService : IDisposable
     Task Remover(Guid id);
     Task Bloquear(Guid id);
     Task Ativar(Guid id);
+    Task Desativar(Guid id);
 }
