@@ -15,14 +15,16 @@ public class PacienteService : BaseService, IPacienteService
         _pacienteRepository = pacienteRepository;
         _notificador = notificador;
     }
-    public async Task Adicionar(NovoPacienteDto novoPacienteDto)
+
+    public async Task AdicionarNovoPaciente(NovoPacienteDto novoPacienteDto)
     {
         var paciente = new Paciente(novoPacienteDto.Nome, novoPacienteDto.DataDeNascimento, novoPacienteDto.CPF, novoPacienteDto.RG, novoPacienteDto.StatusGenero,
                                     novoPacienteDto.StatusEstadoCivil, novoPacienteDto.StatusPaciente, novoPacienteDto.Endereco, novoPacienteDto.Contato);
 
         await _pacienteRepository.Adicionar(paciente);
     }
-    public async Task Atualizar(AtualizarPacienteDto atualizarPacienteDto)
+
+    public async Task AtualizarInfoPaciente(AtualizarPacienteDto atualizarPacienteDto)
     {
         if (atualizarPacienteDto == null)
         {
@@ -49,8 +51,8 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(paciente);
     }
-
-    public async Task Bloquear(Guid id)
+    
+    public async Task BloquearPaciente(Guid id)
     {
         var pacienteExistente = await _pacienteRepository.ObterPorId(id);
         if (pacienteExistente == null)
@@ -63,7 +65,8 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacienteExistente);
     }
-    public async Task Remover(Guid id)
+    
+    public async Task RemoverPaciente(Guid id)
     {
         var pacienteExistente = await _pacienteRepository.ObterPorId(id);
 
@@ -75,8 +78,8 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Remover(id);
     }
-
-    public async Task Ativar(Guid id)
+    
+    public async Task AtivarPaciente(Guid id)
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
 
@@ -84,8 +87,8 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacineteExistente);
     }
-
-    public async Task Desativar(Guid id)
+    
+    public async Task DesativarPaciente(Guid id)
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
 
@@ -93,7 +96,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacineteExistente);
     }
-
+    
     public void Dispose()
     {
         _pacienteRepository?.Dispose();

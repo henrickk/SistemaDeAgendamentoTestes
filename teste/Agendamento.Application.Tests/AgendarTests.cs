@@ -5,10 +5,8 @@ using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 using Agendamento.Application.Tests.Services.Auxiliar;
-
 namespace Agendamento.Application.Tests;
-
-public class AgendaTests
+public class AgendarTests
 {
     // 1. Definição dos Mocks necessários para construir a Service
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
@@ -16,11 +14,10 @@ public class AgendaTests
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly Mock<INotificador> _notificadorMock;
 
-
     // O sistema sob teste (System Under Test)
     private readonly AgendaService _agendaService;
 
-    public AgendaTests()
+    public AgendarTests()
     {
         // 2. Inicialização correta de todos os Mocks
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
@@ -52,7 +49,6 @@ public class AgendaTests
 
         // Act
         // Passando null nos campos de objeto complexo como você estruturou temporariamente
-#pragma warning disable CS8625
         var agendamento = new Agenda(
             agendaDto.PacienteId,
             agendaDto.ProfissionalId,
@@ -62,8 +58,7 @@ public class AgendaTests
             agendaDto.Observacao,
             null,
             null);
-#pragma warning restore CS8625
-
+    
         // Assert
         Assert.Equal(agendaDto.PacienteId, agendamento.PacienteId);
     }
@@ -81,7 +76,6 @@ public class AgendaTests
             Observacao = "Consulta de rotina"
         };
 
-        // Configura o Mock para retornar nulo simulando que o paciente não existe
         _pacienteRepositoryMock.Setup(r => r.ObterPorId(agendaDto.PacienteId))
             .ReturnsAsync((Paciente?)null);
 
@@ -89,7 +83,6 @@ public class AgendaTests
         await _agendaService.Agendar(agendaDto);
 
         // Assert 
-        // Corrigido para criar uma instância de Notificacao ao invés de passar uma string diretamente
         _notificadorMock.Verify(n => n.Handle(It.Is<Notificacao>(notificacao => notificacao.Mensagem == "Paciente não encontrado.")), Times.Once);
     }
 
@@ -109,7 +102,6 @@ public class AgendaTests
             Observacao = "Consulta de rotina"
         };
 
-        // 🟢 PASSO CHAVE: Criar e mockar um paciente válido para passar da primeira validação
         var pacienteValido = new Paciente(
             nome: "Paciente Teste",
             dataNascimento: new DateOnly(1990, 1, 1),
@@ -208,4 +200,3 @@ public class AgendaTests
             Times.Once);
     }
 }
-

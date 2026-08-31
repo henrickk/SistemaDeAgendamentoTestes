@@ -3,6 +3,7 @@
 namespace Agendamento.Application.DTOs;
 public class NovoPacienteDto
 {
+    public Guid PacienteId { get; set; }
     public string Nome { get; set; }
     public DateOnly DataDeNascimento { get; set; }
     public string CPF { get; set; }

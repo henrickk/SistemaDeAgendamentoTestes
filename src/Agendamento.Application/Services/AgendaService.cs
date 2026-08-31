@@ -154,8 +154,6 @@ public class AgendaService : BaseService, IAgendaService
 
     public void Dispose()
     {
-        _agendaRepository.Dispose();
-
-        throw new NotImplementedException();
+        _agendaRepository?.Dispose();
     }
 }

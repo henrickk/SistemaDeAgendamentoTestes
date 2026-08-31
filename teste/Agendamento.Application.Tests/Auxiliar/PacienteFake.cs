@@ -4,12 +4,15 @@ namespace Agendamento.Application.Tests.Services.Auxiliar;
 
 public static class PacienteFixture
 {
-    public static Paciente CriarPacienteFake(StatusPaciente status = StatusPaciente.Ativo)
+    public static Paciente CriarPacienteFake(
+        StatusPaciente status = StatusPaciente.Ativo, 
+        string nome = "Nome Padrão", 
+        string cpf = "00000000000")
     {
         return new Paciente(
-            "Nome Padrão",
+            nome, // usa o parâmetro
             new DateOnly(2000, 1, 1),
-            "00000000000",
+            cpf,  // usa o parâmetro
             "0000000",
             StatusGenero.Masculino,
             StatusEstadoCivil.Solteiro,

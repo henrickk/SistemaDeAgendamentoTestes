@@ -3,10 +3,10 @@ namespace Agendamento.Application.Interfaces;
 
 public interface IPacienteService : IDisposable
 {
-    Task Adicionar(NovoPacienteDto dto);
-    Task Atualizar(AtualizarPacienteDto dto);
-    Task Remover(Guid id);
-    Task Bloquear(Guid id);
-    Task Ativar(Guid id);
-    Task Desativar(Guid id);
+    Task AdicionarNovoPaciente(NovoPacienteDto dto);
+    Task AtualizarInfoPaciente(AtualizarPacienteDto dto);
+    Task RemoverPaciente(Guid id);
+    Task BloquearPaciente(Guid id);
+    Task AtivarPaciente(Guid id);
+    Task DesativarPaciente(Guid id);
 }
