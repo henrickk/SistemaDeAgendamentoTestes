@@ -180,14 +180,12 @@ public class AgendarTests
             Observacao = "Consulta"
         };
 
-        // Mocks para passar pelas primeiras validações
         _pacienteRepositoryMock.Setup(r => r.ObterPorId(agendaDto.PacienteId))
-            .ReturnsAsync(PacienteFixture.CriarPacienteFake()); // 🟢 Chamada corrigida
+            .ReturnsAsync(PacienteFixture.CriarPacienteFake());
 
         _profissionalRepositoryMock.Setup(r => r.ObterPorId(agendaDto.ProfissionalId))
             .ReturnsAsync(ProfissionalFixture.CriarProfissionalFake());
 
-        // Configura o repositório de agenda para dizer que SIM, há conflito (retorna true)
         _agendaRepositoryMock.Setup(r => r.VerificarConflitoProfissional(agendaDto.ProfissionalId, agendaDto.DataInicio, agendaDto.DataFim))
             .ReturnsAsync(true);
 

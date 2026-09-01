@@ -2,6 +2,7 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
+using Agendamento.Domain.Notificacoes;
 
 namespace Agendamento.Application.Services;
 public class PacienteService : BaseService, IPacienteService
@@ -18,11 +19,26 @@ public class PacienteService : BaseService, IPacienteService
 
     public async Task AdicionarNovoPaciente(NovoPacienteDto novoPacienteDto)
     {
-        var paciente = new Paciente(novoPacienteDto.Nome, novoPacienteDto.DataDeNascimento, novoPacienteDto.CPF, novoPacienteDto.RG, novoPacienteDto.StatusGenero,
-                                    novoPacienteDto.StatusEstadoCivil, novoPacienteDto.StatusPaciente, novoPacienteDto.Endereco, novoPacienteDto.Contato);
+        if (string.IsNullOrWhiteSpace(novoPacienteDto.Nome))
+        {
+            _notificador.Handle(new Notificacao("O nome é obrigatório."));
+            return;
+        }
+
+        var paciente = new Paciente(novoPacienteDto.Nome,
+                                    novoPacienteDto.DataDeNascimento,
+                                    novoPacienteDto.CPF,
+                                    novoPacienteDto.RG,
+                                    novoPacienteDto.StatusGenero,
+                                    novoPacienteDto.StatusEstadoCivil,
+                                    novoPacienteDto.StatusPaciente,
+                                    novoPacienteDto.Endereco,
+                                    novoPacienteDto.Contato
+        );
 
         await _pacienteRepository.Adicionar(paciente);
     }
+
 
     public async Task AtualizarInfoPaciente(AtualizarPacienteDto atualizarPacienteDto)
     {
@@ -51,7 +67,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(paciente);
     }
-    
+
     public async Task BloquearPaciente(Guid id)
     {
         var pacienteExistente = await _pacienteRepository.ObterPorId(id);
@@ -65,7 +81,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacienteExistente);
     }
-    
+
     public async Task RemoverPaciente(Guid id)
     {
         var pacienteExistente = await _pacienteRepository.ObterPorId(id);
@@ -78,7 +94,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Remover(id);
     }
-    
+
     public async Task AtivarPaciente(Guid id)
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
@@ -87,7 +103,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacineteExistente);
     }
-    
+
     public async Task DesativarPaciente(Guid id)
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
@@ -96,7 +112,7 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Atualizar(pacineteExistente);
     }
-    
+
     public void Dispose()
     {
         _pacienteRepository?.Dispose();

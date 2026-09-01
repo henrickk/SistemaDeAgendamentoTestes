@@ -3,6 +3,7 @@ using Agendamento.Application.Services;
 using Agendamento.Application.Tests.Services.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
+using Agendamento.Domain.Notificacoes;
 using Moq;
 
 namespace Agendamento.Application.Tests;
@@ -11,19 +12,17 @@ public class AdicionarNovoPacienteTests
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
     private readonly Mock<IAgendaRepository> _agendaRepositoryMock;
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
-    private readonly Mock<INotificador> _notificadorMock;
-
+    private readonly Notificador _notificador;
     private readonly PacienteService _pacienteService;
+
     public AdicionarNovoPacienteTests()
     {
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
         _agendaRepositoryMock = new Mock<IAgendaRepository>();
         _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
-        _notificadorMock = new Mock<INotificador>();
+        _notificador = new Notificador();
 
-        _pacienteService = new PacienteService(
-            new Mock<IPacienteRepository>().Object, _notificadorMock.Object
-        );
+        _pacienteService = new PacienteService(_pacienteRepositoryMock.Object, _notificador);
     }
 
     [Fact]
@@ -58,13 +57,33 @@ public class AdicionarNovoPacienteTests
     }
 
 
-    //[Fact]
-    //public async Task AdicionarNovoPaciente_DeveNotificar_QuandoDadosForemInvalidos()
-    //{
-    // Arrange - Organizar
+    [Fact]
+    public async Task AdicionarNovoPaciente_DeveNotificar_QuandoNomeForVazio()
+    {
+        //Arrange - Organizar
+        var nomeVazio = "";
 
-    // Act - Agir
+        var pacienteDto = new NovoPacienteDto
+        {
+            PacienteId = Guid.NewGuid(),
+            Nome = nomeVazio,
+            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            CPF = "12345678901",
+            RG = "MG1234567",
+            StatusGenero = StatusGenero.Masculino,
+            StatusEstadoCivil = StatusEstadoCivil.Solteiro,
+            StatusPaciente = StatusPaciente.Ativo,
+            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" }
+        };
 
-    // Assert - Afirmar
-    //}
+        //Act - Agir
+        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+
+        //Assert - Afirmar
+        Assert.True(_notificador.TemNotificacao());
+        Assert.Equal(1, _notificador.ObterNotificacoes().Count);
+
+        var notificacoes = _notificador.ObterNotificacoes();
+        Assert.Contains(notificacoes, n => n.Mensagem == "O nome é obrigatório.");
+    }
 }

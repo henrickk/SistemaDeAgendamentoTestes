@@ -8,7 +8,6 @@ public class NovoPacienteDto
     public DateOnly DataDeNascimento { get; set; }
     public string CPF { get; set; }
     public string RG { get; set; }
-    public string OrgaoEmissor { get; set; }
     public StatusGenero StatusGenero { get; set; }
     public StatusEstadoCivil StatusEstadoCivil { get; set; }
     public StatusPaciente StatusPaciente { get; set; }
