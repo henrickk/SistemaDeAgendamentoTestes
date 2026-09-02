@@ -25,6 +25,18 @@ public class PacienteService : BaseService, IPacienteService
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(novoPacienteDto.Contato.NumeroCelular))
+        {
+            _notificador.Handle(new Notificacao("O número de celular é obrigatório."));
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(novoPacienteDto.CPF))
+        {
+            _notificador.Handle(new Notificacao("O CPF é obrigatório."));
+            return;
+        }
+
         var paciente = new Paciente(novoPacienteDto.Nome,
                                     novoPacienteDto.DataDeNascimento,
                                     novoPacienteDto.CPF,
@@ -38,7 +50,6 @@ public class PacienteService : BaseService, IPacienteService
 
         await _pacienteRepository.Adicionar(paciente);
     }
-
 
     public async Task AtualizarInfoPaciente(AtualizarPacienteDto atualizarPacienteDto)
     {

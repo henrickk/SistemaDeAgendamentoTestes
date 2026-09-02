@@ -73,7 +73,8 @@ public class AdicionarNovoPacienteTests
             StatusGenero = StatusGenero.Masculino,
             StatusEstadoCivil = StatusEstadoCivil.Solteiro,
             StatusPaciente = StatusPaciente.Ativo,
-            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" }
+            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" },
+            Contato = new Contato(email: "teste@teste.com", numeroCelular: "1199999-9999")
         };
 
         //Act - Agir
@@ -85,5 +86,68 @@ public class AdicionarNovoPacienteTests
 
         var notificacoes = _notificador.ObterNotificacoes();
         Assert.Contains(notificacoes, n => n.Mensagem == "O nome é obrigatório.");
+    }
+
+    [Fact]
+    public async Task AdicionarNovoPaciente_DeveNotificar_QuandoNumeroDeCelularForVazio()
+    {
+        //Arrange - Organizar
+        var numeroVazio = "";
+
+        var pacienteDto = new NovoPacienteDto
+        {
+            PacienteId = Guid.NewGuid(),
+            Nome = "Nome Teste",
+            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            CPF = "12345678901",
+            RG = "MG1234567",
+            StatusGenero = StatusGenero.Masculino,
+            StatusEstadoCivil = StatusEstadoCivil.Solteiro,
+            StatusPaciente = StatusPaciente.Ativo,
+            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" },
+            Contato = new Contato(email: "teste@teste.com", numeroCelular: numeroVazio)
+        };
+
+        //Act - Agir
+        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+
+        //Assert - Afirmar
+        Assert.True(_notificador.TemNotificacao());
+        Assert.Equal(1, _notificador.ObterNotificacoes().Count);
+
+        var notificacoes = _notificador.ObterNotificacoes();
+        Assert.Contains(notificacoes, n => n.Mensagem == "O número de celular é obrigatório.");
+    }
+
+    [Fact]
+    public async Task AdicionarNovoPaciente_DeveNotificar_QuandoCPFNaoForAdicionado()
+    {
+        //Arrange - Organizar
+        var cpfVazio = "";
+
+        var pacienteDto = new NovoPacienteDto
+        {
+            PacienteId = Guid.NewGuid(),
+            Nome = "Nome Teste",
+            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            CPF = cpfVazio,
+            RG = "MG1234567",
+            StatusGenero = StatusGenero.Masculino,
+            StatusEstadoCivil = StatusEstadoCivil.Solteiro,
+            StatusPaciente = StatusPaciente.Ativo,
+            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" },
+            Contato = new Contato(email: null, numeroCelular: "1199999-9999")
+        };
+
+        //Act - Agir
+        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+
+        //Assert - Afirmar
+        Assert.True(_notificador.TemNotificacao());
+        Assert.Equal(1, _notificador.ObterNotificacoes().Count);
+
+        var notificacoes = _notificador.ObterNotificacoes();
+        Assert.Contains(notificacoes, n => n.Mensagem == "O CPF é obrigatório.");
+
     }
 }
