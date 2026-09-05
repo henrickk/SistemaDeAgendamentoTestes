@@ -88,6 +88,12 @@ public class PacienteService : BaseService, IPacienteService
             return;
         }
 
+        if (pacienteExistente.StatusPaciente == StatusPaciente.Bloqueado)
+        {
+            Notificar("Paciente já está bloqueado.");
+            return;
+        }
+
         pacienteExistente.StatusPaciente = StatusPaciente.Bloqueado;
 
         await _pacienteRepository.Atualizar(pacienteExistente);

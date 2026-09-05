@@ -10,18 +10,13 @@ namespace Agendamento.Application.Tests;
 public class AtualizarInfoPacienteTests
 {
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
-    private readonly Mock<IAgendaRepository> _agendaRepositoryMock;
-    private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly Notificador _notificador;
     private readonly PacienteService _pacienteService;
 
     public AtualizarInfoPacienteTests()
     {
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
-        _agendaRepositoryMock = new Mock<IAgendaRepository>();
-        _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificador = new Notificador();
-
         _pacienteService = new PacienteService(_pacienteRepositoryMock.Object, _notificador);
     }
 
@@ -67,7 +62,7 @@ public class AtualizarInfoPacienteTests
             Endereco = new Endereco(),
             Contato = new Contato( email: "", numeroCelular: "1199999-9999")
         };
-
+        
         // Act - Agir
         await _pacienteService.AtualizarInfoPaciente(pacienteDto);
 
