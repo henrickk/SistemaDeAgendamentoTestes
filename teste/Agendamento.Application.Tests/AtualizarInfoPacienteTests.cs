@@ -24,28 +24,48 @@ public class AtualizarInfoPacienteTests
     public async Task AtualizarInfoPaciente_DeveAtualizar_QuandoPacienteExistir()
     {
         // Arrange - Organizar
-        var paciente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
+        var pacienteExistente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
         var pacienteDto = new AtualizarPacienteDto
         {
-            Id = paciente.Id,
-            Nome = paciente.Nome,
-            DataDeNascimento = paciente.DataNascimento,
-            StatusGenero = paciente.StatusGenero,
-            StatusEstadoCivil = paciente.StatusEstadoCivil,
-            StatusPaciente = paciente.StatusPaciente,
-            Endereco = paciente.Endereco,
-            Contato = paciente.Contato
+            Id = pacienteExistente.Id,
+            Nome = "Nome Atualizado do Paciente",
+            DataDeNascimento = pacienteExistente.DataNascimento,
+            StatusGenero = pacienteExistente.StatusGenero,
+            StatusEstadoCivil = pacienteExistente.StatusEstadoCivil,
+            StatusPaciente = pacienteExistente.StatusPaciente,
+            Endereco = pacienteExistente.Endereco,
+            Contato = pacienteExistente.Contato
         };
+
+        _pacienteRepositoryMock
+            .Setup(r => r.Buscar(It.IsAny<System.Linq.Expressions.Expression<Func<Paciente, bool>>>()))
+            .ReturnsAsync(new List<Paciente> { pacienteExistente });
+
+ 
+        Paciente pacienteAtualizado = null;
+        _pacienteRepositoryMock
+            .Setup(r => r.Atualizar(It.IsAny<Paciente>()))
+            .Callback<Paciente>(p => pacienteAtualizado = p)
+            .Returns(Task.CompletedTask);
 
         // Act - Agir
         await _pacienteService.AtualizarInfoPaciente(pacienteDto);
-        pacienteDto.Id = paciente.Id;
 
         // Assert - Afirmar
-        Assert.Equal(pacienteDto.Id, paciente.Id);
-        Assert.Equal(pacienteDto.Nome, paciente.Nome);
+        if (_notificador.TemNotificacao())
+        {
+            var erroReal = _notificador.ObterNotificacoes().FirstOrDefault()?.Mensagem;
+            Assert.Fail($"O Notificador recebeu um erro inesperado: '{erroReal}'");
+        }
+
+        Assert.False(_notificador.TemNotificacao());
+        Assert.NotNull(pacienteAtualizado);
+        Assert.Equal(pacienteDto.Nome, pacienteAtualizado.Nome);
+
+        _pacienteRepositoryMock.Verify(r => r.Atualizar(It.IsAny<Paciente>()), Times.Once);
     }
+
 
     [Fact]
     public async Task AtualizarInfoPaciente_DeveNotificar_QuandoPacienteNaoExistir()
@@ -59,10 +79,14 @@ public class AtualizarInfoPacienteTests
             StatusGenero = StatusGenero.Masculino,
             StatusEstadoCivil = StatusEstadoCivil.Solteiro,
             StatusPaciente = StatusPaciente.Ativo,
-            Endereco = new Endereco(),
-            Contato = new Contato( email: "", numeroCelular: "1199999-9999")
+            Endereco = new Endereco { Logradouro = "Rua A", Numero = "123", Cidade = "Cidade X", UF = "SP", CEP = "12345-678" },
+            Contato = new Contato(email: "", numeroCelular: "1199999-9999")
         };
-        
+
+        _pacienteRepositoryMock
+            .Setup(r => r.ObterPorId(pacienteDto.Id))
+            .ReturnsAsync((Paciente)null);
+
         // Act - Agir
         await _pacienteService.AtualizarInfoPaciente(pacienteDto);
 
@@ -72,5 +96,7 @@ public class AtualizarInfoPacienteTests
 
         var notificacao = _notificador.ObterNotificacoes();
         Assert.Contains(notificacao, n => n.Mensagem == "Paciente não encontrado.");
+
+        _pacienteRepositoryMock.Verify(r => r.Atualizar(It.IsAny<Paciente>()), Times.Never);
     }
 }

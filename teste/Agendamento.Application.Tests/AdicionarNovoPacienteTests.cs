@@ -29,32 +29,40 @@ public class AdicionarNovoPacienteTests
     public async Task AdicionarNovoPaciente_DeveCriarPaciente_QuandoDadosForemValidos()
     {
         // Arrange - Organizar
-        var paciente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
+        var pacienteFake = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
         var pacienteDto = new NovoPacienteDto
         {
-            PacienteId = paciente.Id,
-            Nome = paciente.Nome,
-            DataDeNascimento = paciente.DataNascimento,
-            CPF = paciente.CPF,
-            RG = paciente.RG,
-            StatusGenero = paciente.StatusGenero,
-            StatusEstadoCivil = paciente.StatusEstadoCivil,
-            StatusPaciente = paciente.StatusPaciente,
-            Endereco = paciente.Endereco,
-            Contato = paciente.Contato
+            PacienteId = pacienteFake.Id,
+            Nome = pacienteFake.Nome,
+            DataDeNascimento = pacienteFake.DataNascimento,
+            CPF = pacienteFake.CPF,
+            RG = pacienteFake.RG,
+            StatusGenero = pacienteFake.StatusGenero,
+            StatusEstadoCivil = pacienteFake.StatusEstadoCivil,
+            StatusPaciente = pacienteFake.StatusPaciente,
+            Endereco = pacienteFake.Endereco,
+            Contato = pacienteFake.Contato
         };
+
+        Paciente pacienteSalvo = null;
+        _pacienteRepositoryMock
+            .Setup(r => r.Adicionar(It.IsAny<Paciente>()))
+            .Callback<Paciente>(p => pacienteSalvo = p)
+            .Returns(Task.CompletedTask);
 
         // Act - Agir
         await _pacienteService.AdicionarNovoPaciente(pacienteDto);
 
-        pacienteDto.PacienteId = paciente.Id;
-
         // Assert - Afirmar
-        Assert.Equal(pacienteDto.PacienteId, paciente.Id);
-        Assert.Equal(pacienteDto.Nome, paciente.Nome);
-        Assert.NotEqual(Guid.Empty, paciente.Id);
+        Assert.False(_notificador.TemNotificacao());
+        Assert.NotNull(pacienteSalvo);
+        Assert.Equal(pacienteDto.Nome, pacienteSalvo.Nome);
+        Assert.Equal(pacienteDto.CPF, pacienteSalvo.CPF);
+
+        _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Once);
     }
+
 
 
     [Fact]
@@ -86,6 +94,8 @@ public class AdicionarNovoPacienteTests
 
         var notificacoes = _notificador.ObterNotificacoes();
         Assert.Contains(notificacoes, n => n.Mensagem == "O nome é obrigatório.");
+
+        _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Never);
     }
 
     [Fact]
@@ -117,6 +127,8 @@ public class AdicionarNovoPacienteTests
 
         var notificacoes = _notificador.ObterNotificacoes();
         Assert.Contains(notificacoes, n => n.Mensagem == "O número de celular é obrigatório.");
+
+        _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Never);
     }
 
     [Fact]
@@ -149,5 +161,6 @@ public class AdicionarNovoPacienteTests
         var notificacoes = _notificador.ObterNotificacoes();
         Assert.Contains(notificacoes, n => n.Mensagem == "O CPF é obrigatório.");
 
+        _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Never);
     }
 }

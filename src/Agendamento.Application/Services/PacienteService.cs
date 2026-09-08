@@ -116,6 +116,24 @@ public class PacienteService : BaseService, IPacienteService
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
 
+        if (pacineteExistente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        if (pacineteExistente.StatusPaciente == StatusPaciente.Ativo)
+        {
+            Notificar("Paciente já está ativo.");
+            return;
+        }
+
+        if (pacineteExistente.StatusPaciente == StatusPaciente.Bloqueado)
+        {
+            Notificar("Paciente está bloqueado e não pode ser ativado.");
+            return;
+        }
+
         pacineteExistente.StatusPaciente = StatusPaciente.Ativo;
 
         await _pacienteRepository.Atualizar(pacineteExistente);
@@ -124,6 +142,24 @@ public class PacienteService : BaseService, IPacienteService
     public async Task DesativarPaciente(Guid id)
     {
         var pacineteExistente = await _pacienteRepository.ObterPorId(id);
+
+        if (pacineteExistente == null)
+        {
+            Notificar("Paciente não encontrado.");
+            return;
+        }
+
+        if (pacineteExistente.StatusPaciente == StatusPaciente.Inativo)
+        {
+            Notificar("Paciente já está inativo.");
+            return;
+        }
+
+        if (pacineteExistente.StatusPaciente == StatusPaciente.Bloqueado)
+        {
+            Notificar("Paciente está bloqueado e não pode ser desativado.");
+            return;
+        }
 
         pacineteExistente.StatusPaciente = StatusPaciente.Inativo;
 
