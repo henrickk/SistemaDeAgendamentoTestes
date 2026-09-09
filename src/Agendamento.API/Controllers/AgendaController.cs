@@ -98,9 +98,6 @@ public class AgendaController : MainController
         return CustomResponse(HttpStatusCode.NoContent);
     }
 
-    //[HttpPut]
-    //[Route("confirmar-agendamento/{agendamentoId:guid}")]
-
     [HttpDelete]
     [Route("cancelar-agendamento/{agendamentoId:guid}")]
     public async Task<ActionResult> CancelarAgendamento(Guid agendamentoId)

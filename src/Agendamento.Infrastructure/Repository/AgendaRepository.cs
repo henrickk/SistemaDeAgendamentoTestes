@@ -1,5 +1,6 @@
 ﻿using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
+using Agendamento.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace Agendamento.Infrastructure.Repository;
@@ -7,9 +8,9 @@ public class AgendaRepository : Repository<Agenda>, IAgendaRepository
 {
     private readonly DbContext _context;
 
-    public AgendaRepository(DbContext context) : base()
+    public AgendaRepository(MeuDbContext dbContext) : base(dbContext)
     {
-        _context = context;
+        _context = dbContext;
     }
 
     public async Task Adicionar(Agenda agenda)

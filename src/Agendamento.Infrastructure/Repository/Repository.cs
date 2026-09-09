@@ -10,6 +10,12 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity, 
     protected readonly MeuDbContext meuDbContext;
     protected readonly DbSet<TEntity> DbSet;
 
+    public Repository(MeuDbContext meuDbContext)
+    {
+        this.meuDbContext = meuDbContext;
+        DbSet = meuDbContext.Set<TEntity>();
+    }
+
     public async Task<IEnumerable<TEntity>> Buscar(Expression<Func<TEntity, bool>> predicate)
     {
         return await DbSet.AsNoTracking().Where(predicate).ToListAsync();
