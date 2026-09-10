@@ -74,7 +74,9 @@ public class PacienteController : MainController
             return CustomResponse(ModelState);
         }
         await _pacienteRepository.Adicionar(paciente);
+        await _pacienteRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.Created, paciente);
+
     }
 
     [HttpPut]
@@ -87,6 +89,7 @@ public class PacienteController : MainController
             return CustomResponse(ModelState);
         }
         await _pacienteRepository.Atualizar(paciente);
+        await _pacienteRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.NoContent);
     }
 
@@ -101,6 +104,7 @@ public class PacienteController : MainController
             return NotFound();
         }
         await _pacienteRepository.Remover(id);
+        await _pacienteRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.NoContent);
     }
 }

@@ -31,11 +31,10 @@ public class AdicionarNovoPacienteTests
         // Arrange - Organizar
         var pacienteFake = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
-        var pacienteDto = new NovoPacienteDto
+        var pacienteDto = new Paciente
         {
-            PacienteId = pacienteFake.Id,
             Nome = pacienteFake.Nome,
-            DataDeNascimento = pacienteFake.DataNascimento,
+            DataNascimento = pacienteFake.DataNascimento,
             CPF = pacienteFake.CPF,
             RG = pacienteFake.RG,
             StatusGenero = pacienteFake.StatusGenero,
@@ -71,11 +70,10 @@ public class AdicionarNovoPacienteTests
         //Arrange - Organizar
         var nomeVazio = "";
 
-        var pacienteDto = new NovoPacienteDto
+        var pacienteDto = new Paciente
         {
-            PacienteId = Guid.NewGuid(),
             Nome = nomeVazio,
-            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
             CPF = "12345678901",
             RG = "MG1234567",
             StatusGenero = StatusGenero.Masculino,
@@ -104,11 +102,10 @@ public class AdicionarNovoPacienteTests
         //Arrange - Organizar
         var numeroVazio = "";
 
-        var pacienteDto = new NovoPacienteDto
+        var paciente = new Paciente
         {
-            PacienteId = Guid.NewGuid(),
             Nome = "Nome Teste",
-            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
             CPF = "12345678901",
             RG = "MG1234567",
             StatusGenero = StatusGenero.Masculino,
@@ -119,7 +116,7 @@ public class AdicionarNovoPacienteTests
         };
 
         //Act - Agir
-        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+        await _pacienteService.AdicionarNovoPaciente(paciente);
 
         //Assert - Afirmar
         Assert.True(_notificador.TemNotificacao());
@@ -137,11 +134,10 @@ public class AdicionarNovoPacienteTests
         //Arrange - Organizar
         var cpfVazio = "";
 
-        var pacienteDto = new NovoPacienteDto
+        var pacienteDto = new Paciente
         {
-            PacienteId = Guid.NewGuid(),
             Nome = "Nome Teste",
-            DataDeNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
+            DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
             CPF = cpfVazio,
             RG = "MG1234567",
             StatusGenero = StatusGenero.Masculino,

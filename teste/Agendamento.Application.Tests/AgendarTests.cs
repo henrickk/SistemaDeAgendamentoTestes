@@ -5,6 +5,7 @@ using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 using Agendamento.Application.Tests.Services.Auxiliar;
+using Agendamento.Application.Tests.Auxiliar;
 namespace Agendamento.Application.Tests;
 public class AgendarTests
 {
@@ -58,7 +59,7 @@ public class AgendarTests
             agendaDto.Observacao,
             null,
             null);
-    
+
         // Assert
         Assert.Equal(agendaDto.PacienteId, agendamento.PacienteId);
     }

@@ -5,7 +5,6 @@ using Agendamento.Domain.Notificacoes;
 using Agendamento.Infrastructure.Context; // Link com o seu projeto de infraestrutura
 using Agendamento.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

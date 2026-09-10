@@ -31,8 +31,6 @@ public class AgendaService : BaseService, IAgendaService
 
         if (paciente.StatusPaciente == StatusPaciente.Bloqueado)
         {
-            // Certifique-se de que o método interno do seu BaseService 
-            // realmente cria e envia o objeto Notificacao esperado.
             Notificar("Paciente bloqueado. Não é possível realizar agendamento.");
             return;
         }
@@ -45,7 +43,6 @@ public class AgendaService : BaseService, IAgendaService
             return;
         }
 
-        // 🔴 NOVA VALIDAÇÃO: Verificar conflito de horário
         var possuiConflito = await _agendaRepository.VerificarConflitoProfissional(
             novoAgendamentoDto.ProfissionalId,
             novoAgendamentoDto.DataInicio,
@@ -69,6 +66,7 @@ public class AgendaService : BaseService, IAgendaService
         null);
 
         await _agendaRepository.Adicionar(agendamento);
+        await _agendaRepository.SaveChanges();
     }
 
     public async Task CancelarAgendamento(Guid agendamentoId)
@@ -89,6 +87,7 @@ public class AgendaService : BaseService, IAgendaService
 
         agendamento.StatusAgendamento = StatusAgendamento.Cancelado;
         await _agendaRepository.Atualizar(agendamento);
+        await _agendaRepository.SaveChanges();
     }
 
     public async Task ConcluirAgendamento(Guid agendamentoId)
@@ -106,6 +105,7 @@ public class AgendaService : BaseService, IAgendaService
         }
         agendamento.StatusAgendamento = StatusAgendamento.Concluido;
         await _agendaRepository.Atualizar(agendamento);
+        await _agendaRepository.SaveChanges();
     }
 
     public async Task ConfirmarAgendamento(Guid agendamentoId)
@@ -148,8 +148,9 @@ public class AgendaService : BaseService, IAgendaService
             return;
         }
 
-        agendamento.StatusAgendamento = StatusAgendamento.Confirmado; // Corrigido para alterar o status diretamente
+        agendamento.StatusAgendamento = StatusAgendamento.Confirmado;
         await _agendaRepository.Atualizar(agendamento);
+        await _agendaRepository.SaveChanges();
     }
 
     public void Dispose()

@@ -26,11 +26,10 @@ public class AtualizarInfoPacienteTests
         // Arrange - Organizar
         var pacienteExistente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
-        var pacienteDto = new AtualizarPacienteDto
+        var pacienteDto = new Paciente
         {
-            Id = pacienteExistente.Id,
             Nome = "Nome Atualizado do Paciente",
-            DataDeNascimento = pacienteExistente.DataNascimento,
+            DataNascimento = pacienteExistente.DataNascimento,
             StatusGenero = pacienteExistente.StatusGenero,
             StatusEstadoCivil = pacienteExistente.StatusEstadoCivil,
             StatusPaciente = pacienteExistente.StatusPaciente,
@@ -71,11 +70,10 @@ public class AtualizarInfoPacienteTests
     public async Task AtualizarInfoPaciente_DeveNotificar_QuandoPacienteNaoExistir()
     {
         // Arrange - Organizar
-        var pacienteDto = new AtualizarPacienteDto
+        var paciente = new Paciente
         {
-            Id = Guid.NewGuid(),
             Nome = "Paciente Inexistente",
-            DataDeNascimento = new DateOnly(1990, 1, 1),
+            DataNascimento = new DateOnly(1990, 1, 1),
             StatusGenero = StatusGenero.Masculino,
             StatusEstadoCivil = StatusEstadoCivil.Solteiro,
             StatusPaciente = StatusPaciente.Ativo,
@@ -84,11 +82,11 @@ public class AtualizarInfoPacienteTests
         };
 
         _pacienteRepositoryMock
-            .Setup(r => r.ObterPorId(pacienteDto.Id))
+            .Setup(r => r.ObterPorId(paciente.Id))
             .ReturnsAsync((Paciente)null);
 
         // Act - Agir
-        await _pacienteService.AtualizarInfoPaciente(pacienteDto);
+        await _pacienteService.AtualizarInfoPaciente(paciente);
 
         // Assert - Afirmar
         Assert.True(_notificador.TemNotificacao());

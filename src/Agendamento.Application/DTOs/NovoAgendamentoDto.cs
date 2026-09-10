@@ -6,5 +6,4 @@ public class NovoAgendamentoDto
     public DateTime DataInicio { get; set; }
     public DateTime DataFim { get; set; }
     public string? Observacao { get; set; }
-
 }

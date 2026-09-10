@@ -17,64 +17,52 @@ public class PacienteService : BaseService, IPacienteService
         _notificador = notificador;
     }
 
-    public async Task AdicionarNovoPaciente(NovoPacienteDto novoPacienteDto)
+    public async Task AdicionarNovoPaciente(Paciente paciente)
     {
-        if (string.IsNullOrWhiteSpace(novoPacienteDto.Nome))
+        if (string.IsNullOrWhiteSpace(paciente.Nome))
         {
             _notificador.Handle(new Notificacao("O nome é obrigatório."));
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(novoPacienteDto.Contato.NumeroCelular))
+        if (string.IsNullOrWhiteSpace(paciente.Contato.NumeroCelular))
         {
             _notificador.Handle(new Notificacao("O número de celular é obrigatório."));
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(novoPacienteDto.CPF))
+        if (string.IsNullOrWhiteSpace(paciente.CPF))
         {
             _notificador.Handle(new Notificacao("O CPF é obrigatório."));
             return;
         }
 
-        var paciente = new Paciente(novoPacienteDto.Nome,
-                                    novoPacienteDto.DataDeNascimento,
-                                    novoPacienteDto.CPF,
-                                    novoPacienteDto.RG,
-                                    novoPacienteDto.StatusGenero,
-                                    novoPacienteDto.StatusEstadoCivil,
-                                    novoPacienteDto.StatusPaciente,
-                                    novoPacienteDto.Endereco,
-                                    novoPacienteDto.Contato
-        );
+        var pacienteExistente = await _pacienteRepository.Buscar(p => p.CPF == paciente.CPF);
+
+        if (pacienteExistente.Any())
+        {
+            Notificar("Já existe um paciente com este CPF.");
+            return;
+        }
 
         await _pacienteRepository.Adicionar(paciente);
     }
 
-    public async Task AtualizarInfoPaciente(AtualizarPacienteDto atualizarPacienteDto)
+    public async Task AtualizarInfoPaciente(Paciente paciente)
     {
-        if (atualizarPacienteDto == null)
+        if (paciente == null)
         {
             Notificar("Os dados para atualização não podem ser nulos.");
             return;
         }
 
-        var pacienteExistente = await _pacienteRepository.Buscar(p => p.Id == atualizarPacienteDto.Id);
+        var pacienteExistente = await _pacienteRepository.Buscar(p => p.Id == paciente.Id && p.CPF == paciente.CPF);
 
-        if (pacienteExistente == null || !pacienteExistente.Any())
+        if (!pacienteExistente.Any())
         {
             Notificar("Paciente não encontrado.");
             return;
         }
-
-        var paciente = pacienteExistente.First();
-        paciente.Nome = atualizarPacienteDto.Nome;
-        paciente.DataNascimento = atualizarPacienteDto.DataDeNascimento;
-        paciente.StatusGenero = atualizarPacienteDto.StatusGenero;
-        paciente.StatusEstadoCivil = atualizarPacienteDto.StatusEstadoCivil;
-        paciente.StatusPaciente = atualizarPacienteDto.StatusPaciente;
-        paciente.Endereco = atualizarPacienteDto.Endereco;
-        paciente.Contato = atualizarPacienteDto.Contato;
 
         await _pacienteRepository.Atualizar(paciente);
     }

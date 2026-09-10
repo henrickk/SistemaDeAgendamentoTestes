@@ -2,9 +2,7 @@
 
 public class Profissional : Entity
 {
-    public Profissional()
-    {
-    }
+    public Profissional() { }
 
     public string Nome { get; set; }
     public string CRO { get; set; }
@@ -13,8 +11,5 @@ public class Profissional : Entity
     public TimeOnly HoraFim { get; set; }
     public Contato Contato { get; set; }
     public Endereco Endereco { get; set; }
-
-
-
 }
 
