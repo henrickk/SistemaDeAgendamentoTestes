@@ -1,6 +1,7 @@
 ﻿using Agendamento.Application.DTOs;
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
+using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 
 namespace Agendamento.Application.Services;
@@ -13,22 +14,35 @@ public class ProfissionalService : BaseService, IProfissionalService
         _profissionalRepository = profissionalRepository;
     }
 
-    public Task AdicionarAsync(NovoProfissionalDto dto)
+    public async Task AdicionarProfissional(Profissional profissional)
     {
-        throw new NotImplementedException();
+        var profissionalExistente = await _profissionalRepository.Buscar(p => p.CRO == profissional.CRO);
+
+        if (profissionalExistente.Any())
+        {
+            Notificar("Já existe um profissional com este CRO.");
+            return;
+        }
+
+        await _profissionalRepository.Adicionar(profissional);
+        await _profissionalRepository.SaveChanges();
     }
 
-    public Task AtivarAsync(Guid id)
+    public Task AtivarProfissional(Guid id)
     {
-        throw new NotImplementedException();
+        var profissional = _profissionalRepository.ObterPorId(id).Result;
+
+        if (profissional == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return Task.CompletedTask;
+        }
+
+        _profissionalRepository.Atualizar(Profissional);
+        return Task.CompletedTask;
     }
 
-    public Task AtualizarAsync(AtualizarProfissionalDto dto)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task BloquearAsync(Guid id)
+    public Task AtualizarProfissional(AtualizarProfissionalDto dto)
     {
         throw new NotImplementedException();
     }
@@ -38,7 +52,7 @@ public class ProfissionalService : BaseService, IProfissionalService
         throw new NotImplementedException();
     }
 
-    public Task RemoverAsync(Guid id)
+    public Task RemoverProfissional(Guid id)
     {
         throw new NotImplementedException();
     }

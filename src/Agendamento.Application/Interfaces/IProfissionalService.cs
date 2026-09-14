@@ -1,12 +1,12 @@
 ﻿using Agendamento.Application.DTOs;
+using Agendamento.Domain.Models;
 
 namespace Agendamento.Application.Interfaces;
 
 public interface IProfissionalService : IDisposable
 {
-    Task AdicionarAsync(NovoProfissionalDto dto);
-    Task AtualizarAsync(AtualizarProfissionalDto dto);
-    Task RemoverAsync(Guid id);
-    Task BloquearAsync(Guid id);
-    Task AtivarAsync(Guid id);
+    Task AdicionarProfissional(Profissional profissional);
+    Task AtualizarProfissional(AtualizarProfissionalDto dto);
+    Task RemoverProfissional(Guid id);
+    Task AtivarProfissional(Guid id);
 }

@@ -71,7 +71,7 @@ public class AgendaController : MainController
         if (!ModelState.IsValid) return CustomResponse(ModelState);
 
         await _agendaService.Agendar(novoAgendamentoDto);
-
+        await _agendaRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.Created, novoAgendamentoDto);
     }
 
@@ -95,6 +95,7 @@ public class AgendaController : MainController
         agendamentoExistente.StatusAgendamento = atualizarAgendamentoDto.StatusAgendamento;
 
         await _agendaRepository.Atualizar(agendamentoExistente);
+        await _agendaRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.NoContent);
     }
 
@@ -111,7 +112,7 @@ public class AgendaController : MainController
         }
 
         await _agendaService.CancelarAgendamento(agendamentoId);
-
+        await _agendaRepository.SaveChanges();
         return CustomResponse();
     }
 }
