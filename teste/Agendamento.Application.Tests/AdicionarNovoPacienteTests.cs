@@ -31,7 +31,7 @@ public class AdicionarNovoPacienteTests
         // Arrange - Organizar
         var pacienteFake = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
-        var pacienteDto = new Paciente
+        var paciente = new Paciente
         {
             Nome = pacienteFake.Nome,
             DataNascimento = pacienteFake.DataNascimento,
@@ -51,13 +51,13 @@ public class AdicionarNovoPacienteTests
             .Returns(Task.CompletedTask);
 
         // Act - Agir
-        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+        await _pacienteService.AdicionarNovoPaciente(paciente);
 
         // Assert - Afirmar
         Assert.False(_notificador.TemNotificacao());
         Assert.NotNull(pacienteSalvo);
-        Assert.Equal(pacienteDto.Nome, pacienteSalvo.Nome);
-        Assert.Equal(pacienteDto.CPF, pacienteSalvo.CPF);
+        Assert.Equal(paciente.Nome, pacienteSalvo.Nome);
+        Assert.Equal(paciente.CPF, pacienteSalvo.CPF);
 
         _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Once);
     }
@@ -70,7 +70,7 @@ public class AdicionarNovoPacienteTests
         //Arrange - Organizar
         var nomeVazio = "";
 
-        var pacienteDto = new Paciente
+        var paciente = new Paciente
         {
             Nome = nomeVazio,
             DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
@@ -84,7 +84,7 @@ public class AdicionarNovoPacienteTests
         };
 
         //Act - Agir
-        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+        await _pacienteService.AdicionarNovoPaciente(paciente);
 
         //Assert - Afirmar
         Assert.True(_notificador.TemNotificacao());
@@ -134,7 +134,7 @@ public class AdicionarNovoPacienteTests
         //Arrange - Organizar
         var cpfVazio = "";
 
-        var pacienteDto = new Paciente
+        var paciente = new Paciente
         {
             Nome = "Nome Teste",
             DataNascimento = DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
@@ -148,7 +148,7 @@ public class AdicionarNovoPacienteTests
         };
 
         //Act - Agir
-        await _pacienteService.AdicionarNovoPaciente(pacienteDto);
+        await _pacienteService.AdicionarNovoPaciente(paciente);
 
         //Assert - Afirmar
         Assert.True(_notificador.TemNotificacao());

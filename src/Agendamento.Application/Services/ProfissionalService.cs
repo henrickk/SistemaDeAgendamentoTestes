@@ -17,6 +17,12 @@ public class ProfissionalService : BaseService, IProfissionalService
     {
         var profissionalExistente = await _profissionalRepository.Buscar(p => p.CRO == profissional.CRO);
 
+        if (profissionalExistente == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return;
+        }
+
         if (profissionalExistente.Any())
         {
             Notificar("Já existe um profissional com este CRO.");
@@ -24,20 +30,6 @@ public class ProfissionalService : BaseService, IProfissionalService
         }
 
         await _profissionalRepository.Adicionar(profissional);
-        await _profissionalRepository.SaveChanges();
-    }
-
-    public async Task AtivarProfissional(Guid id)
-    {
-        var profissional = _profissionalRepository.ObterPorId(id).Result;
-
-        if (profissional == null)
-        {
-            Notificar("Profissional não encontrado.");
-            return;
-        }
-
-        _profissionalRepository.Atualizar(profissional);
         await _profissionalRepository.SaveChanges();
     }
 
