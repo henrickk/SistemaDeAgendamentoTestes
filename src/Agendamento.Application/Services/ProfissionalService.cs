@@ -13,7 +13,7 @@ public class ProfissionalService : BaseService, IProfissionalService
         _profissionalRepository = profissionalRepository;
     }
 
-    public async Task AdicionarProfissional(Profissional profissional)
+    public async Task AdicionarNovoProfissional(Profissional profissional)
     {
         var profissionalExistente = await _profissionalRepository.Buscar(p => p.CRO == profissional.CRO);
 
@@ -33,11 +33,11 @@ public class ProfissionalService : BaseService, IProfissionalService
         await _profissionalRepository.SaveChanges();
     }
 
-    public async Task AtualizarProfissional(AtualizarProfissionalDto dto)
+    public async Task AtualizarProfissional(Profissional profissional)
     {
-        var profissional = await _profissionalRepository.ObterPorId(dto.Id);
+        var profissionalExistente = await _profissionalRepository.ObterPorId(profissional.Id);
 
-        if (profissional == null)
+        if (profissionalExistente == null)
         {
             Notificar("Profissional não encontrado.");
             return;
@@ -46,6 +46,7 @@ public class ProfissionalService : BaseService, IProfissionalService
         _profissionalRepository.Atualizar(profissional);
         await _profissionalRepository.SaveChanges();
     }
+
     public async Task RemoverProfissional(Guid id)
     {
         var profissional = await _profissionalRepository.ObterPorId(id);

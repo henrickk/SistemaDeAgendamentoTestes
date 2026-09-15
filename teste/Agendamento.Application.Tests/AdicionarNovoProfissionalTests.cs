@@ -9,13 +9,13 @@ using Moq;
 using System.Linq.Expressions;
 
 namespace Agendamento.Application.Tests;
-public class AdicionarProfissionalTests
+public class AdicionarNovoProfissionalTests
 {
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly IProfissionalService _profissionalService;
     private readonly Notificador _notificador;
 
-    public AdicionarProfissionalTests()
+    public AdicionarNovoProfissionalTests()
     {
         _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificador = new Notificador();
@@ -24,7 +24,7 @@ public class AdicionarProfissionalTests
     }
 
     [Fact]
-    public async Task AdicionarProfissional_DeveAdicionarProfissionalComSucesso()
+    public async Task AdicionarNovoProfissional_DeveDeveCriarPaciente_QuandoDadosForemValidos()
     {
         // Arrange
         var profissionalServiceMock = new Mock<IProfissionalService>();
@@ -49,7 +49,7 @@ public class AdicionarProfissionalTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await _profissionalService.AdicionarProfissional(profissional);
+        await _profissionalService.AdicionarNovoProfissional(profissional);
 
         // Assert
 
@@ -65,7 +65,7 @@ public class AdicionarProfissionalTests
     }
 
     [Fact]
-    public async Task AdicionarProfissional_DeveNotificarQuandoProfissionalJaExistir()
+    public async Task AdicionarNovoProfissional_DeveNotificar_QuandoProfissionalJaExistir()
     {
         // Arrange
         var profissionalFake = ProfissionalFixture.CriarProfissionalFake();
@@ -87,7 +87,7 @@ public class AdicionarProfissionalTests
             .ReturnsAsync(new List<Profissional> { profissional });
 
         // Act
-        await _profissionalService.AdicionarProfissional(profissional);
+        await _profissionalService.AdicionarNovoProfissional(profissional);
 
         // Assert
         Assert.True(_notificador.TemNotificacao());
@@ -96,7 +96,7 @@ public class AdicionarProfissionalTests
     }
 
     [Fact]
-    public async Task AdicionarProfissional_DeveNotificarQuandoProfissionalNaoExistir()
+    public async Task AdicionarNovoProfissional_DeveNotificarQuandoProfissionalNaoExistir()
     {
         // Arrange
         var profissionalFake = ProfissionalFixture.CriarProfissionalFake();
@@ -117,7 +117,7 @@ public class AdicionarProfissionalTests
             .ReturnsAsync((IEnumerable<Profissional>)null);
 
         // Act
-        await _profissionalService.AdicionarProfissional(profissional);
+        await _profissionalService.AdicionarNovoProfissional(profissional);
 
         // Assert
         Assert.True(_notificador.TemNotificacao());

@@ -5,7 +5,7 @@ namespace Agendamento.Application.Interfaces;
 
 public interface IProfissionalService : IDisposable
 {
-    Task AdicionarProfissional(Profissional profissional);
-    Task AtualizarProfissional(AtualizarProfissionalDto dto);
+    Task AdicionarNovoProfissional(Profissional profissional);
+    Task AtualizarProfissional(Profissional profissional);
     Task RemoverProfissional(Guid id);
 }

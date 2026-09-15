@@ -5,6 +5,7 @@ using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
+using System.Linq.Expressions;
 
 namespace Agendamento.Application.Tests;
 public class AtualizarInfoPacienteTests
@@ -26,7 +27,7 @@ public class AtualizarInfoPacienteTests
         // Arrange - Organizar
         var pacienteExistente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
-        var pacienteDto = new Paciente
+        var paciente = new Paciente
         {
             Nome = "Nome Atualizado do Paciente",
             DataNascimento = pacienteExistente.DataNascimento,
@@ -38,7 +39,7 @@ public class AtualizarInfoPacienteTests
         };
 
         _pacienteRepositoryMock
-            .Setup(r => r.Buscar(It.IsAny<System.Linq.Expressions.Expression<Func<Paciente, bool>>>()))
+            .Setup(r => r.Buscar(It.IsAny<Expression<Func<Paciente, bool>>>()))
             .ReturnsAsync(new List<Paciente> { pacienteExistente });
 
  
@@ -49,7 +50,7 @@ public class AtualizarInfoPacienteTests
             .Returns(Task.CompletedTask);
 
         // Act - Agir
-        await _pacienteService.AtualizarInfoPaciente(pacienteDto);
+        await _pacienteService.AtualizarInfoPaciente(paciente);
 
         // Assert - Afirmar
         if (_notificador.TemNotificacao())
@@ -60,7 +61,7 @@ public class AtualizarInfoPacienteTests
 
         Assert.False(_notificador.TemNotificacao());
         Assert.NotNull(pacienteAtualizado);
-        Assert.Equal(pacienteDto.Nome, pacienteAtualizado.Nome);
+        Assert.Equal(paciente.Nome, pacienteAtualizado.Nome);
 
         _pacienteRepositoryMock.Verify(r => r.Atualizar(It.IsAny<Paciente>()), Times.Once);
     }
