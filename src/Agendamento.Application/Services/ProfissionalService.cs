@@ -2,13 +2,12 @@
 using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Agendamento.Domain.Notificacoes;
 
 namespace Agendamento.Application.Services;
 public class ProfissionalService : BaseService, IProfissionalService
 {
     private readonly IProfissionalRepository _profissionalRepository;
-     
+
     public ProfissionalService(IProfissionalRepository profissionalRepository, INotificador notificador) : base(notificador)
     {
         _profissionalRepository = profissionalRepository;
@@ -28,32 +27,47 @@ public class ProfissionalService : BaseService, IProfissionalService
         await _profissionalRepository.SaveChanges();
     }
 
-    public Task AtivarProfissional(Guid id)
+    public async Task AtivarProfissional(Guid id)
     {
         var profissional = _profissionalRepository.ObterPorId(id).Result;
 
         if (profissional == null)
         {
             Notificar("Profissional não encontrado.");
-            return Task.CompletedTask;
+            return;
         }
 
-        _profissionalRepository.Atualizar(Profissional);
-        return Task.CompletedTask;
+        _profissionalRepository.Atualizar(profissional);
+        await _profissionalRepository.SaveChanges();
     }
 
-    public Task AtualizarProfissional(AtualizarProfissionalDto dto)
+    public async Task AtualizarProfissional(AtualizarProfissionalDto dto)
     {
-        throw new NotImplementedException();
+        var profissional = await _profissionalRepository.ObterPorId(dto.Id);
+
+        if (profissional == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return;
+        }
+
+        _profissionalRepository.Atualizar(profissional);
+        await _profissionalRepository.SaveChanges();
+    }
+    public async Task RemoverProfissional(Guid id)
+    {
+        var profissional = await _profissionalRepository.ObterPorId(id);
+
+        if (profissional == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return;
+        }
+        await _profissionalRepository.Remover(id);
     }
 
     public void Dispose()
     {
-        throw new NotImplementedException();
-    }
-
-    public Task RemoverProfissional(Guid id)
-    {
-        throw new NotImplementedException();
+        _profissionalRepository?.Dispose();
     }
 }
