@@ -12,7 +12,6 @@ public class Paciente : Entity
     public Contato Contato { get; set; }
 
     public Paciente() { }
-    // protected Paciente() { }
 
     public Paciente(string nome, DateOnly dataNascimento, string cpf, string rg, StatusGenero statusGenero, StatusEstadoCivil statusEstadoCivil, StatusPaciente statusPaciente, Endereco endereco, Contato contato)
     {

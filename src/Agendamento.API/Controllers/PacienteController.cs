@@ -6,7 +6,7 @@ using System.Net;
 namespace Agendamento.API.Controllers;
 
 [ApiController]
-[Route("api/agenda")]
+[Route("api/paciente")]
 public class PacienteController : MainController
 {
     private readonly IPacienteRepository _pacienteRepository;
@@ -20,7 +20,6 @@ public class PacienteController : MainController
     [Route("api/paciente/consultar-pacientes")]
     public async Task<ActionResult<IEnumerable<Paciente>>> ObterTodosPacientes()
     {
-        // Lógica para obter todos os pacientes
         var pacientes = await _pacienteRepository.ObterTodos();
         return Ok(pacientes);
     }

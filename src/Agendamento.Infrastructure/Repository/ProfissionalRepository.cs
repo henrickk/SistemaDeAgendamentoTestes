@@ -7,28 +7,33 @@ namespace Agendamento.Infrastructure.Repository;
 
 public class ProfissionalRepository : Repository<Profissional>, IProfissionalRepository
 {
-    private readonly MeuDbContext _context;
+    private readonly MeuDbContext _dbContext;
     public ProfissionalRepository(MeuDbContext context) : base(context)
     {
-        _context = context;
+        _dbContext = context;
     }
 
-    public Task<Profissional> ObterPorId(int id)
+    public async Task<Profissional> ObterPorId(Guid id)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Profissionais.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Profissional> ObterPorId(Guid id) =>
-        await _context.Set<Profissional>().FindAsync(id);
+    public async Task<List<Profissional>> ObterTodos()
+    {
+        return await _dbContext.Profissionais.AsNoTracking().ToListAsync();
+    }
 
-    public async Task<List<Profissional>> ObterTodos() =>
-        await _context.Set<Profissional>().ToListAsync();
+    public async Task<Profissional> ObterPorCRO(string cro)
+    {
+        return await _dbContext.Profissionais.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.CRO == cro);
+    }
 
-    public async Task<Profissional> ObterPorCRO(string cro) =>
-        await _context.Set<Profissional>().FirstOrDefaultAsync(p => p.CRO == cro);
-
-    public async Task<Profissional> ObterPorNome(string nome) =>
-        await _context.Set<Profissional>().FirstOrDefaultAsync(p => p.Nome == nome);
-
-
+    public async Task<List<Profissional>> ObterPorNome(string nome)
+    {
+        return await _dbContext.Profissionais.AsNoTracking()
+            .Where(p => p.Nome == nome)
+            .ToListAsync();
+    }
 }
