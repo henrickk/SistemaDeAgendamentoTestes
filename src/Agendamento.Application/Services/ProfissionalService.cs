@@ -1,5 +1,4 @@
-﻿using Agendamento.Application.DTOs;
-using Agendamento.Application.Interfaces;
+﻿using Agendamento.Application.Interfaces;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 

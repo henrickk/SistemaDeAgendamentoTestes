@@ -1,5 +1,4 @@
-﻿using Agendamento.Application.Interfaces;
-using Agendamento.Application.Services;
+﻿using Agendamento.Application.Services;
 using Agendamento.Application.Tests.Services.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
@@ -25,7 +24,7 @@ public class RemoverPacienteTests
     }
 
     [Fact]
-    public async Task RemoverPaciente_DeveRemoverPacienteExistente()
+    public async Task RemoverPaciente_DeveRemover_QuandoPacienteExistente()
     {
         // Arrange
         var paciente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
