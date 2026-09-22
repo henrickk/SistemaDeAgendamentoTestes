@@ -1,3 +1,4 @@
+using Agendamento.API.Configurations;
 using Agendamento.Application.Interfaces;
 using Agendamento.Application.Services;
 using Agendamento.Domain.Interfaces;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<INotificador, Notificador>();
 builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,8 +1,8 @@
-﻿using Agendamento.Domain.Interfaces;
+﻿using Agendamento.Application.DTOs;
+using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Agendamento.Infrastructure.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using AutoMapper;
 
 namespace Agendamento.API.Controllers;
 
@@ -11,36 +11,37 @@ namespace Agendamento.API.Controllers;
 public class ProfissionalController : MainController
 {
     private readonly IProfissionalRepository _profissionalRepository;
+    private readonly IMapper _mapper;
 
-    public ProfissionalController(IProfissionalRepository profissionalRepository, INotificador notificador) : base(notificador)
+    public ProfissionalController(IProfissionalRepository profissionalRepository, IMapper mapper, INotificador notificador) : base(notificador)
     {
         _profissionalRepository = profissionalRepository;
+        _mapper = mapper;
     }
 
-    [HttpGet]
-    [Route("api/profissional/consultar-profissionais")]
-    public async Task<ActionResult<IEnumerable<Profissional>>> ObterTodosProfissionais()
+    [HttpGet("consultar-profissionais")]
+    public async Task<ActionResult<IEnumerable<ProfissionalDto>>> ObterTodosProfissionais()
     {
-        var profissionais = await _profissionalRepository.ObterTodos();
+        var profissionais = _mapper.Map<IEnumerable<ProfissionalDto>>(await _profissionalRepository.ObterTodos());
         return Ok(profissionais);
     }
 
-    [HttpGet]
-    [Route("api/profissional/consultar-profissional/{id:guid}")]
-    public async Task<ActionResult<Profissional>> ObterProfissionaisPorId(Guid Id)
+    [HttpGet("consultar-profissional-por-id/{id:guid}")]
+    public async Task<ActionResult<ProfissionalDto>> ObterProfissionaisPorId(Guid id)
     {
-        var profissional = await _profissionalRepository.ObterPorId(Id);
+        var profissional = _mapper.Map<ProfissionalDto>(await _profissionalRepository.ObterPorId(id));
+
         if (profissional == null)
         {
             NotificarErro("Profissional não encontrado.");
             return NotFound();
         }
+
         return Ok(profissional);
     }
 
-    [HttpGet]
-    [Route("api/profissional/consultar-profissional-por-nome/{nome}")]
-    public async Task<ActionResult<IEnumerable<Profissional>>> ObterProfissionaisPorNome(string nome)
+    [HttpGet("consultar-profissional-por-nome/{nome}")]
+    public async Task<ActionResult<IEnumerable<ProfissionalDto>>> ObterProfissionaisPorNome(string nome)
     {
         var profissionais = await _profissionalRepository.ObterPorNome(nome);
         if (profissionais == null || !profissionais.Any())
@@ -48,14 +49,14 @@ public class ProfissionalController : MainController
             NotificarErro("Nenhum profissional encontrado com o nome fornecido.");
             return NotFound();
         }
-        return Ok(profissionais);
+        var profissionaisDto = _mapper.Map<IEnumerable<ProfissionalDto>>(profissionais);
+        return Ok(profissionaisDto);
     }
 
-    [HttpGet]
-    [Route("api/profissional/consultar-profissional-por-cro/{cro}")]
-    public async Task<ActionResult<Profissional>> ObterProfissionaisPorCRO(string cro)
+    [HttpGet("consultar-profissional-por-cro/{cro}")]
+    public async Task<ActionResult<ProfissionalDto>> ObterProfissionaisPorCRO(string cro)
     {
-        var profissional = await _profissionalRepository.ObterPorCRO(cro);
+        var profissional = _mapper.Map<ProfissionalDto>(await _profissionalRepository.ObterPorCRO(cro));
         if (profissional == null)
         {
             NotificarErro("Profissional não encontrado.");
@@ -64,9 +65,8 @@ public class ProfissionalController : MainController
         return Ok(profissional);
     }
 
-    [HttpPost]
-    [Route("api/profissional/cadastrar-profissional")]
-    public async Task<ActionResult<Profissional>> CriarProfissional([FromBody] Profissional profissional)
+    [HttpPost("cadastrar-profissional")]
+    public async Task<ActionResult<ProfissionalDto>> CriarProfissional([FromBody] Profissional profissional)
     {
         if (!ModelState.IsValid)
         {
@@ -75,28 +75,38 @@ public class ProfissionalController : MainController
         }
         await _profissionalRepository.Adicionar(profissional);
         await _profissionalRepository.SaveChanges();
-        return CreatedAtAction(nameof(ObterProfissionaisPorId), new { id = profissional.Id }, profissional);
+        var profesionalDto = _mapper.Map<ProfissionalDto>(profissional);
+        return CreatedAtAction(nameof(ObterProfissionaisPorId), new { id = profissional.Id }, profesionalDto);
     }
 
-    [HttpPut]
-    [Route("api/profissional/atualizar-profissional")]
-    public async Task<ActionResult<Profissional>> AtualizarProfissional([FromBody] Profissional profissional)
+    [HttpPut("atualizar-profissional")]
+    public async Task<ActionResult<AtualizarProfissionalDto>> AtualizarProfissional([FromBody] AtualizarProfissionalDto profissionalDto)
     {
         if (!ModelState.IsValid)
         {
             NotificarErro("Dados inválidos.");
             return BadRequest(ModelState);
         }
-        await _profissionalRepository.Atualizar(profissional);
+
+        var profissionalExistente = await _profissionalRepository.ObterPorId(profissionalDto.Id);
+
+        if (profissionalExistente == null)
+        {
+            NotificarErro("Profissional não encontrado.");
+            return NotFound();
+        }
+
+        await _profissionalRepository.Atualizar(profissionalExistente);
         await _profissionalRepository.SaveChanges();
-        return Ok(profissional);
+
+        return Ok(profissionalDto);
     }
 
-    [HttpDelete]
-    [Route("api/profissional/excluir-profissional/{id:guid}")]
+
+    [HttpDelete("excluir-profissional/{id:guid}")]
     public async Task<ActionResult> ExcluirProfissional(Guid id)
     {
-        var profissional = await _profissionalRepository.ObterPorId(id);
+        var profissional = _mapper.Map<ProfissionalDto>(await _profissionalRepository.ObterPorId(id));
         if (profissional == null)
         {
             NotificarErro("Profissional não encontrado.");
