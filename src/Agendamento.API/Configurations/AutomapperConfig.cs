@@ -11,6 +11,10 @@ public class AutomapperConfig : Profile
         CreateMap<Profissional, ProfissionalDto>().ReverseMap();
         CreateMap<Agenda, AgendadosDto>().ReverseMap();
         CreateMap<Profissional, AtualizarProfissionalDto>().ReverseMap();
-        CreateMap<AtualizarProfissionalDto, Profissional>();
+
+        CreateMap<NovoPacienteDto, Paciente>().ReverseMap();
+        CreateMap<Paciente, PacienteDto>().ReverseMap();
+
+        CreateMap<Contato, ContatoDto>().ReverseMap();
     }
 }

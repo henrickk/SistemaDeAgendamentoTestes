@@ -16,12 +16,17 @@ public class ProfissionalRepository : Repository<Profissional>, IProfissionalRep
     public async Task<Profissional> ObterPorId(Guid id)
     {
         return await _dbContext.Profissionais.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<List<Profissional>> ObterTodos()
     {
-        return await _dbContext.Profissionais.AsNoTracking().ToListAsync();
+        return await _dbContext.Profissionais.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
+            .ToListAsync();
     }
 
     public async Task<Profissional> ObterPorCRO(string cro)

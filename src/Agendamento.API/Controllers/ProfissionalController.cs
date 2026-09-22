@@ -1,8 +1,9 @@
 ﻿using Agendamento.Application.DTOs;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Agendamento.API.Controllers;
 
@@ -66,29 +67,34 @@ public class ProfissionalController : MainController
     }
 
     [HttpPost("cadastrar-profissional")]
-    public async Task<ActionResult<ProfissionalDto>> CriarProfissional([FromBody] Profissional profissional)
+    public async Task<ActionResult<ProfissionalDto>> CriarProfissional([FromBody] NovoProfissionalDto profissionaDto)
     {
         if (!ModelState.IsValid)
         {
-            NotificarErro("Dados inválidos.");
-            return BadRequest(ModelState);
+            NotificarErroModelInvalida(ModelState);
+            return CustomResponse(ModelState);
         }
+
+        var profissional = _mapper.Map<Profissional>(profissionaDto);
+
         await _profissionalRepository.Adicionar(profissional);
         await _profissionalRepository.SaveChanges();
-        var profesionalDto = _mapper.Map<ProfissionalDto>(profissional);
-        return CreatedAtAction(nameof(ObterProfissionaisPorId), new { id = profissional.Id }, profesionalDto);
+
+        var profesionalRetornoDto = _mapper.Map<ProfissionalDto>(profissional);
+
+        return CustomResponse(HttpStatusCode.Created, profesionalRetornoDto);
     }
 
-    [HttpPut("atualizar-profissional")]
-    public async Task<ActionResult<AtualizarProfissionalDto>> AtualizarProfissional([FromBody] AtualizarProfissionalDto profissionalDto)
+    [HttpPut("atualizar-profissional/{id:guid}")]
+    public async Task<ActionResult<AtualizarProfissionalDto>> AtualizarProfissional(Guid id, [FromBody] AtualizarProfissionalDto profissionalDto)
     {
         if (!ModelState.IsValid)
         {
-            NotificarErro("Dados inválidos.");
-            return BadRequest(ModelState);
+            NotificarErroModelInvalida(ModelState);
+            return CustomResponse(ModelState);
         }
 
-        var profissionalExistente = await _profissionalRepository.ObterPorId(profissionalDto.Id);
+        var profissionalExistente = await _profissionalRepository.ObterPorId(id);
 
         if (profissionalExistente == null)
         {
@@ -102,7 +108,6 @@ public class ProfissionalController : MainController
         return Ok(profissionalDto);
     }
 
-
     [HttpDelete("excluir-profissional/{id:guid}")]
     public async Task<ActionResult> ExcluirProfissional(Guid id)
     {
@@ -114,6 +119,6 @@ public class ProfissionalController : MainController
         }
         await _profissionalRepository.Remover(id);
         await _profissionalRepository.SaveChanges();
-        return NoContent();
+        return CustomResponse(HttpStatusCode.NoContent);
     }
 }

@@ -1,5 +1,7 @@
-﻿using Agendamento.Domain.Interfaces;
+﻿using Agendamento.Application.DTOs;
+using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -10,25 +12,25 @@ namespace Agendamento.API.Controllers;
 public class PacienteController : MainController
 {
     private readonly IPacienteRepository _pacienteRepository;
+    private readonly IMapper _mapper;
 
-    public PacienteController(IPacienteRepository pacienteRepository, INotificador notificador) : base(notificador)
+    public PacienteController(IPacienteRepository pacienteRepository, IMapper mapper, INotificador notificador) : base(notificador)
     {
         _pacienteRepository = pacienteRepository;
+        _mapper = mapper;
     }
 
-    [HttpGet]
-    [Route("api/paciente/consultar-pacientes")]
-    public async Task<ActionResult<IEnumerable<Paciente>>> ObterTodosPacientes()
+    [HttpGet("consultar-pacientes")]
+    public async Task<ActionResult<IEnumerable<PacienteDto>>> ObterTodosPacientes()
     {
-        var pacientes = await _pacienteRepository.ObterTodos();
+        var pacientes = _mapper.Map<IEnumerable<PacienteDto>>(await _pacienteRepository.ObterTodos());
         return Ok(pacientes);
     }
 
-    [HttpGet]
-    [Route("api/paciente/consultar-paciente/{id:guid}")]
-    public async Task<ActionResult<Paciente>> ObterPacientePorId(Guid id)
+    [HttpGet("consultar-paciente/{id:guid}")]
+    public async Task<ActionResult<PacienteDto>> ObterPacientePorId(Guid id)
     {
-        var paciente = await _pacienteRepository.ObterPorId(id);
+        var paciente = _mapper.Map<PacienteDto>(await _pacienteRepository.ObterPorId(id));
         if (paciente == null)
         {
             NotificarErro("Paciente não encontrado.");
@@ -37,11 +39,10 @@ public class PacienteController : MainController
         return Ok(paciente);
     }
 
-    [HttpGet]
-    [Route("api/paciente/consultar-paciente-por-cpf/{cpf}")]
-    public async Task<ActionResult<Paciente>> ObterPacientePorCPF(string cpf)
+    [HttpGet("consultar-paciente-por-cpf/{cpf}")]
+    public async Task<ActionResult<PacienteDto>> ObterPacientePorCPF(string cpf)
     {
-        var paciente = await _pacienteRepository.ObterPorCPF(cpf);
+        var paciente = _mapper.Map<PacienteDto>(await _pacienteRepository.ObterPorCPF(cpf));
         if (paciente == null)
         {
             NotificarErro("Paciente não encontrado.");
@@ -50,11 +51,10 @@ public class PacienteController : MainController
         return Ok(paciente);
     }
 
-    [HttpGet]
-    [Route("api/paciente/consultar-paciente-por-nome/{nome}")]
-    public async Task<ActionResult<IEnumerable<Paciente>>> ObterPacientePorNome(string nome)
+    [HttpGet("consultar-paciente-por-nome/{nome}")]
+    public async Task<ActionResult<IEnumerable<PacienteDto>>> ObterPacientePorNome(string nome)
     {
-        var pacientes = await _pacienteRepository.ObterPacientesPorNome(nome);
+        var pacientes = _mapper.Map<IEnumerable<PacienteDto>>(await _pacienteRepository.ObterPacientesPorNome(nome));
         if (pacientes == null || !pacientes.Any())
         {
             NotificarErro("Nenhum paciente encontrado com o nome fornecido.");
@@ -63,40 +63,52 @@ public class PacienteController : MainController
         return Ok(pacientes.ToList().FirstOrDefault());
     }
 
-    [HttpPost]
-    [Route("api/paciente/criar-paciente")]
-    public async Task<ActionResult<Paciente>> CriarPaciente([FromBody] Paciente paciente)
+    [HttpPost("criar-paciente")]
+    public async Task<ActionResult<PacienteDto>> CriarPaciente([FromBody] NovoPacienteDto novoPacienteDto)
     {
         if (!ModelState.IsValid)
         {
             NotificarErroModelInvalida(ModelState);
             return CustomResponse(ModelState);
         }
+
+        var paciente = _mapper.Map<Paciente>(novoPacienteDto);
+
         await _pacienteRepository.Adicionar(paciente);
         await _pacienteRepository.SaveChanges();
-        return CustomResponse(HttpStatusCode.Created, paciente);
 
+        var pacienteRetornoDto = _mapper.Map<PacienteDto>(paciente);
+
+        return CustomResponse(HttpStatusCode.Created, pacienteRetornoDto);
     }
 
-    [HttpPut]
-    [Route("api/paciente/atualizar-paciente")]
-    public async Task<ActionResult<Paciente>> AtualizarPaciente([FromBody] Paciente paciente)
+    [HttpPut("atualizar-paciente/{id:guid}")]
+    public async Task<ActionResult<PacienteDto>> AtualizarPaciente(Guid id, [FromBody] AtualizarPacienteDto pacienteDto)
     {
         if (!ModelState.IsValid)
         {
             NotificarErroModelInvalida(ModelState);
             return CustomResponse(ModelState);
         }
-        await _pacienteRepository.Atualizar(paciente);
+
+        var pacienteExistente = await _pacienteRepository.ObterPorId(id);
+
+        if (pacienteExistente == null)
+        {
+            NotificarErro("Paciente não encontrado.");
+            return NotFound();
+        }
+
+        await _pacienteRepository.Atualizar(pacienteExistente);
         await _pacienteRepository.SaveChanges();
-        return CustomResponse(HttpStatusCode.NoContent);
+
+        return Ok(pacienteDto);
     }
 
-    [HttpDelete]
-    [Route("api/paciente/excluir-paciente/{id:guid}")]
+    [HttpDelete("excluir-paciente/{id:guid}")]
     public async Task<ActionResult> ExcluirPaciente(Guid id)
     {
-        var paciente = await _pacienteRepository.ObterPorId(id);
+        var paciente = _mapper.Map<PacienteDto>(await _pacienteRepository.ObterPorId(id));
         if (paciente == null)
         {
             NotificarErro("Paciente não encontrado.");

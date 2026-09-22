@@ -21,17 +21,24 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
     public async Task<Paciente> ObterPorId(Guid id)
     {
         return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<List<Paciente>> ObterTodos()
     {
-        return await _dbContext.Pacientes.AsNoTracking().ToListAsync();
+        return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
+            .ToListAsync();
     }
 
     public async Task<List<Paciente>> ObterPacientesPorNome(string nome)
     {
         return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .Where(p => p.Nome.Contains(nome))
             .ToListAsync();
     }
@@ -39,18 +46,24 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
     public async Task<Paciente> ObterPorCPF(string cpf)
     {
         return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .FirstOrDefaultAsync(p => p.CPF == cpf);
     }
 
     public async Task<Paciente> ObterPorEmail(string email)
     {
         return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .FirstOrDefaultAsync(p => p.Contato.Email == email);
     }
 
     public async Task<Paciente> ObterPorTelefone(string telefone)
     {
         return await _dbContext.Pacientes.AsNoTracking()
+            .Include(p => p.Contato)
+            .Include(p => p.Endereco)
             .FirstOrDefaultAsync(p => p.Contato.NumeroCelular == telefone);
     }
 
