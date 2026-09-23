@@ -8,6 +8,15 @@ public class AutomapperConfig : Profile
 {
     public AutomapperConfig()
     {
+        CreateMap<NovoAgendamentoDto, Agenda>()
+            .ForMember(dest => dest.StatusAgendamento, opt => opt.MapFrom(src => StatusAgendamento.Agendado));
+
+        CreateMap<Agenda, AgendadosDto>()
+            .ForMember(dest => dest.PacienteNome, opt => opt.MapFrom(src => src.Paciente.Nome))
+            .ForMember(dest => dest.PacienteContato, opt => opt.MapFrom(src => src.Paciente.Contato))
+            .ForMember(dest => dest.ProfissionalNome, opt => opt.MapFrom(src => src.Profissional.Nome))
+            .ForMember(dest => dest.ProfissionalNome, opt => opt.MapFrom(src => src.Profissional.Nome));
+
         CreateMap<Profissional, ProfissionalDto>().ReverseMap();
         CreateMap<Agenda, AgendadosDto>().ReverseMap();
         CreateMap<Profissional, AtualizarProfissionalDto>().ReverseMap();

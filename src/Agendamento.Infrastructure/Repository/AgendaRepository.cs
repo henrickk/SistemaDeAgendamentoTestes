@@ -4,41 +4,55 @@ using Agendamento.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace Agendamento.Infrastructure.Repository;
+
 public class AgendaRepository : Repository<Agenda>, IAgendaRepository
 {
-    private readonly DbContext _context;
-
-    public AgendaRepository(MeuDbContext dbContext) : base(dbContext)
+    private readonly MeuDbContext _dbContext;
+    public AgendaRepository(MeuDbContext context) : base(context)
     {
-        _context = dbContext;
+        _dbContext = context;
     }
 
-    public async Task Adicionar(Agenda agenda)
+    public async Task<List<Agenda>> ObterTodos()
     {
-        await _context.Set<Agenda>().AddAsync(agenda);
-        await _context.SaveChangesAsync();
+        return await _dbContext.Agendas.AsNoTracking()
+            .Include(a => a.Paciente)
+                .ThenInclude(p => p.Contato)
+            .Include(a => a.Profissional)
+            .ToListAsync();
     }
 
-    public async Task<bool> VerificarConflitoProfissional(Guid profissionalId, DateTime inicio, DateTime fim)
+    public async Task<Agenda> ObterPorId(Guid id)
     {
-        return await _context.Set<Agenda>()
-            .AnyAsync(a => a.ProfissionalId == profissionalId
-                           && inicio < a.DataFim
-                           && fim > a.DataInicio);
+        return await _dbContext.Agendas.AsNoTracking()
+            .Include(p => p.Paciente)
+            .Include(p => p.Profissional)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<bool> ExisteConflitoHorario(Guid profissionalId, DateTime dataInicio, DateTime dataFim)
     {
-        return await _context.Set<Agenda>()
-            .AnyAsync(a => a.ProfissionalId == profissionalId
-                           && dataInicio < a.DataFim
-                           && dataFim > a.DataInicio);
+        // Usando o 'DbSet' herdado da base
+        return await DbSet.AnyAsync(a => a.ProfissionalId == profissionalId
+                                       && dataInicio < a.DataFim
+                                       && dataFim > a.DataInicio);
     }
 
-    public async Task<List<Agenda>> ObterAgendamentosPorProfissional(Guid profissionalId)
+    public async Task<IEnumerable<Agenda>> ObterTodosComRelacionamentos()
     {
-        return await _context.Set<Agenda>()
-            .Where(a => a.ProfissionalId == profissionalId)
+        return await DbSet.AsNoTracking()
+            .Include(a => a.Paciente)
+                .ThenInclude(p => p.Contato)
+            .Include(a => a.Profissional)
             .ToListAsync();
+    }
+
+    public async Task<Agenda> ObterPorIdComRelacionamentos(Guid id)
+    {
+        return await DbSet.AsNoTracking()
+            .Include(a => a.Paciente)
+                .ThenInclude(p => p.Contato)
+            .Include(a => a.Profissional)
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 }

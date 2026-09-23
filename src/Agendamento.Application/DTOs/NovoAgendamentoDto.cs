@@ -1,4 +1,6 @@
-﻿namespace Agendamento.Application.DTOs;
+﻿using Agendamento.Domain.Models;
+
+namespace Agendamento.Application.DTOs;
 public class NovoAgendamentoDto
 {
     public Guid PacienteId { get; set; }
@@ -6,4 +8,5 @@ public class NovoAgendamentoDto
     public DateTime DataInicio { get; set; }
     public DateTime DataFim { get; set; }
     public string? Observacao { get; set; }
+    public StatusAgendamento StatusAgendamento { get; set; } = StatusAgendamento.Agendado;
 }

@@ -109,6 +109,7 @@ public class PacienteController : MainController
     public async Task<ActionResult> ExcluirPaciente(Guid id)
     {
         var paciente = _mapper.Map<PacienteDto>(await _pacienteRepository.ObterPorId(id));
+
         if (paciente == null)
         {
             NotificarErro("Paciente não encontrado.");

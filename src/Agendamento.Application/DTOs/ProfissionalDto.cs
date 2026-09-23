@@ -1,6 +1,4 @@
-﻿using Agendamento.Domain.Models;
-
-namespace Agendamento.Application.DTOs;
+﻿namespace Agendamento.Application.DTOs;
 public class ProfissionalDto
 {
     public Guid Id { get; set; }

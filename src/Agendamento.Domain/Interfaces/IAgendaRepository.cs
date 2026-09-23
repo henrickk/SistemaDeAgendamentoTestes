@@ -4,13 +4,10 @@ namespace Agendamento.Domain.Interfaces;
 
 public interface IAgendaRepository : IRepository<Agenda>
 {
-    Task<bool> ExisteConflitoHorario(
-        Guid profissionalId,
-        DateTime dataInicio,
-        DateTime dataFim);
+    // Mantido apenas um método de conflito de horário
+    Task<bool> ExisteConflitoHorario(Guid profissionalId, DateTime dataInicio, DateTime dataFim);
 
-    Task<List<Agenda>> ObterAgendamentosPorProfissional(Guid profissionalId);
-
-    Task<bool> VerificarConflitoProfissional(Guid profissionalId, DateTime inicio, DateTime fim);
-    Task Adicionar(Agenda agenda);
+    // Métodos novos essenciais para alimentar o AgendadosDto com os relacionamentos carregados
+    Task<IEnumerable<Agenda>> ObterTodosComRelacionamentos();
+    Task<Agenda> ObterPorIdComRelacionamentos(Guid id);
 }

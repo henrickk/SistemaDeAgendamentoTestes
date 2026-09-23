@@ -43,7 +43,7 @@ public class AgendaService : BaseService, IAgendaService
             return;
         }
 
-        var possuiConflito = await _agendaRepository.VerificarConflitoProfissional(
+        var possuiConflito = await _agendaRepository.ExisteConflitoHorario(
             novoAgendamentoDto.ProfissionalId,
             novoAgendamentoDto.DataInicio,
             novoAgendamentoDto.DataFim
