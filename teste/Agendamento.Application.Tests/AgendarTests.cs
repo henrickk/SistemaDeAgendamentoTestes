@@ -187,7 +187,7 @@ public class AgendarTests
         _profissionalRepositoryMock.Setup(r => r.ObterPorId(agendaDto.ProfissionalId))
             .ReturnsAsync(ProfissionalFixture.CriarProfissionalFake());
 
-        _agendaRepositoryMock.Setup(r => r.VerificarConflitoProfissional(agendaDto.ProfissionalId, agendaDto.DataInicio, agendaDto.DataFim))
+        _agendaRepositoryMock.Setup(r => r.ExisteConflitoHorario(agendaDto.ProfissionalId, agendaDto.DataInicio, agendaDto.DataFim))
             .ReturnsAsync(true);
 
         // Act

@@ -24,6 +24,8 @@ public class AutomapperConfig : Profile
         CreateMap<NovoPacienteDto, Paciente>().ReverseMap();
         CreateMap<Paciente, PacienteDto>().ReverseMap();
 
+        CreateMap<Endereco, EnderecoDto>().ReverseMap();
+
         CreateMap<Contato, ContatoDto>().ReverseMap();
     }
 }

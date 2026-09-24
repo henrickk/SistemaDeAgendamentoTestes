@@ -76,7 +76,7 @@ public class AgendaController : MainController
 
         var agendamento = _mapper.Map<Agenda>(novoAgendamentoDto);
 
-        await _agendaRepository.Adicionar(agendamento);
+        await _agendaService.Agendar(novoAgendamentoDto);
         await _agendaRepository.SaveChanges();
 
         var agendamentoCompleto = await _agendaRepository.ObterPorIdComRelacionamentos(agendamento.Id);
@@ -86,28 +86,16 @@ public class AgendaController : MainController
         return CustomResponse(HttpStatusCode.Created, agendaRetorno);
     }
 
-    [HttpPut("Atualizar/{id:guid}")]
+    [HttpPut("atualizar/{id:guid}")]
     public async Task<ActionResult<AgendadosDto>> AtualizarAgendamento(Guid id, [FromBody] AtualizarAgendamentoDto atualizarAgendamentoDto)
     {
         if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-        var agendamentoExistente = await _agendaRepository.ObterPorId(id);
-        if (agendamentoExistente == null)
-        {
-            NotificarErro("Agendamento não encontrado.");
-            return CustomResponse();
-        }
+        await _agendaService.AtualizarAgendamento(id, atualizarAgendamentoDto);
 
-        agendamentoExistente.DataInicio = atualizarAgendamentoDto.DataInicio;
-        agendamentoExistente.DataFim = atualizarAgendamentoDto.DataFim;
-        agendamentoExistente.Observacao = atualizarAgendamentoDto.Observacao;
-        agendamentoExistente.ProfissionalId = atualizarAgendamentoDto.ProfissionalId;
-        agendamentoExistente.StatusAgendamento = atualizarAgendamentoDto.StatusAgendamento;
-
-        await _agendaRepository.Atualizar(agendamentoExistente);
-        await _agendaRepository.SaveChanges();
         return CustomResponse(HttpStatusCode.NoContent);
     }
+
 
     [HttpDelete("cancelar-agendamento/{id:guid}")]
     public async Task<ActionResult<AgendadosDto>> CancelarAgendamento(Guid id)

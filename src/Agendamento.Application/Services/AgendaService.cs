@@ -121,7 +121,7 @@ public class AgendaService : BaseService, IAgendaService
 
         if (agendamento.StatusAgendamento == StatusAgendamento.Agendado)
         {
-            agendamento.StatusAgendamento = StatusAgendamento.Confirmado; // Corrigido para alterar o status diretamente
+            agendamento.StatusAgendamento = StatusAgendamento.Confirmado; 
             await _agendaRepository.Atualizar(agendamento);
             return;
         }
@@ -153,8 +153,54 @@ public class AgendaService : BaseService, IAgendaService
         await _agendaRepository.SaveChanges();
     }
 
+    public async Task AtualizarAgendamento(Guid id, AtualizarAgendamentoDto atualizarAgendamentoDto)
+    {
+        // 1. Busca o agendamento atual que está gravado no banco de dados
+        var agendamentoExistente = await _agendaRepository.ObterPorId(id);
+
+        if (agendamentoExistente == null)
+        {
+            Notificar("Agendamento não encontrado.");
+            return;
+        }
+
+        // 2. Valida se o profissional informado existe
+        var profissional = await _profissionalRepository.ObterPorId(atualizarAgendamentoDto.ProfissionalId);
+        if (profissional == null)
+        {
+            Notificar("Profissional não encontrado.");
+            return;
+        }
+
+        // 3. Valida conflito de horários (garantindo que não seja com ele mesmo)
+        var possuiConflito = await _agendaRepository.ExisteConflitoHorario(
+            atualizarAgendamentoDto.ProfissionalId,
+            atualizarAgendamentoDto.DataInicio,
+            atualizarAgendamentoDto.DataFim
+        );
+
+        // Se mudou o horário/profissional e bateu com outro agendamento existente no banco
+        if (possuiConflito && (agendamentoExistente.DataInicio != atualizarAgendamentoDto.DataInicio || agendamentoExistente.ProfissionalId != atualizarAgendamentoDto.ProfissionalId))
+        {
+            Notificar("O profissional já possui um agendamento neste horário.");
+            return;
+        }
+
+        // 4. Aplica as alterações na entidade monitorada pelo Entity Framework
+        agendamentoExistente.DataInicio = atualizarAgendamentoDto.DataInicio;
+        agendamentoExistente.DataFim = atualizarAgendamentoDto.DataFim;
+        agendamentoExistente.Observacao = atualizarAgendamentoDto.Observacao;
+        agendamentoExistente.ProfissionalId = atualizarAgendamentoDto.ProfissionalId;
+        agendamentoExistente.StatusAgendamento = atualizarAgendamentoDto.StatusAgendamento;
+
+        // 5. Salva no banco de dados de forma segura
+        await _agendaRepository.Atualizar(agendamentoExistente);
+        await _agendaRepository.SaveChanges();
+    }
+
     public void Dispose()
     {
         _agendaRepository?.Dispose();
     }
+
 }

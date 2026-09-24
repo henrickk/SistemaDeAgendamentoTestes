@@ -11,4 +11,6 @@ public interface IAgendaService : IDisposable
     Task CancelarAgendamento(Guid agendamentoId);
 
     Task ConcluirAgendamento(Guid agendamentoId);
+
+    Task AtualizarAgendamento(Guid id, AtualizarAgendamentoDto atualizarAgendamentoDto);
 }
