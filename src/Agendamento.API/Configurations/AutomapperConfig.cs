@@ -15,11 +15,11 @@ public class AutomapperConfig : Profile
             .ForMember(dest => dest.PacienteNome, opt => opt.MapFrom(src => src.Paciente.Nome))
             .ForMember(dest => dest.PacienteContato, opt => opt.MapFrom(src => src.Paciente.Contato))
             .ForMember(dest => dest.ProfissionalNome, opt => opt.MapFrom(src => src.Profissional.Nome))
-            .ForMember(dest => dest.ProfissionalNome, opt => opt.MapFrom(src => src.Profissional.Nome));
+            .ForMember(dest => dest.CRO, opt => opt.MapFrom(src => src.Profissional.CRO));
 
         CreateMap<Profissional, ProfissionalDto>().ReverseMap();
-        CreateMap<Agenda, AgendadosDto>().ReverseMap();
         CreateMap<Profissional, AtualizarProfissionalDto>().ReverseMap();
+        CreateMap<NovoProfissionalDto, Profissional>().ReverseMap();
 
         CreateMap<NovoPacienteDto, Paciente>().ReverseMap();
         CreateMap<Paciente, PacienteDto>().ReverseMap();

@@ -12,4 +12,5 @@ public class AgendadosDto
     public string PacienteNome { get; set; }
     public ContatoDto PacienteContato { get; set; }
     public string ProfissionalNome { get; set; }
+    public string CRO { get; set; }
 }
