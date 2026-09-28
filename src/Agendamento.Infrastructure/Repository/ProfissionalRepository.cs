@@ -32,6 +32,7 @@ public class ProfissionalRepository : Repository<Profissional>, IProfissionalRep
     public async Task<Profissional> ObterPorCRO(string cro)
     {
         return await _dbContext.Profissionais.AsNoTracking()
+            .Include(p => p.Contato)
             .FirstOrDefaultAsync(p => p.CRO == cro);
     }
 
@@ -39,6 +40,7 @@ public class ProfissionalRepository : Repository<Profissional>, IProfissionalRep
     {
         return await _dbContext.Profissionais.AsNoTracking()
             .Where(p => p.Nome == nome)
+            .Include(p => p.Contato)
             .ToListAsync();
     }
 }
