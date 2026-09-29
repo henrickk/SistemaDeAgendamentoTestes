@@ -15,7 +15,9 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
 
     public async Task<IEnumerable<Paciente>> Buscar(Expression<Func<Paciente, bool>> predicate)
     {
-        return await Task.FromResult(_dbContext.Pacientes.AsNoTracking().Where(predicate).ToList());
+        return await Task.FromResult(_dbContext.Pacientes.AsNoTracking()
+            .Where(predicate)
+            .ToList());
     }
 
     public async Task<Paciente> ObterPorId(Guid id)

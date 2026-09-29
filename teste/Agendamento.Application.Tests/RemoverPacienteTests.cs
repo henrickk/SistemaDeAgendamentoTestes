@@ -9,16 +9,12 @@ namespace Agendamento.Application.Tests;
 public class RemoverPacienteTests
 {
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
-    private readonly Mock<IAgendaRepository> _agendaRepositoryMock;
-    private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly Notificador _notificador;
     private readonly PacienteService pacienteService;
 
     public RemoverPacienteTests()
     {
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
-        _agendaRepositoryMock = new Mock<IAgendaRepository>();
-        _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificador = new Notificador();
         pacienteService = new PacienteService(_pacienteRepositoryMock.Object, _notificador);
     }

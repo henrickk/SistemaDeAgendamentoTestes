@@ -1,5 +1,4 @@
-﻿using Agendamento.Application.DTOs;
-using Agendamento.Application.Services;
+﻿using Agendamento.Application.Services;
 using Agendamento.Application.Tests.Services.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
@@ -10,16 +9,12 @@ namespace Agendamento.Application.Tests;
 public class AdicionarNovoPacienteTests
 {
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
-    private readonly Mock<IAgendaRepository> _agendaRepositoryMock;
-    private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly Notificador _notificador;
     private readonly PacienteService _pacienteService;
 
     public AdicionarNovoPacienteTests()
     {
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
-        _agendaRepositoryMock = new Mock<IAgendaRepository>();
-        _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificador = new Notificador();
 
         _pacienteService = new PacienteService(_pacienteRepositoryMock.Object, _notificador);
@@ -31,19 +26,6 @@ public class AdicionarNovoPacienteTests
         // Arrange - Organizar
         var pacienteFake = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
 
-        var paciente = new Paciente
-        {
-            Nome = pacienteFake.Nome,
-            DataNascimento = pacienteFake.DataNascimento,
-            CPF = pacienteFake.CPF,
-            RG = pacienteFake.RG,
-            StatusGenero = pacienteFake.StatusGenero,
-            StatusEstadoCivil = pacienteFake.StatusEstadoCivil,
-            StatusPaciente = pacienteFake.StatusPaciente,
-            Endereco = pacienteFake.Endereco,
-            Contato = pacienteFake.Contato
-        };
-
         Paciente pacienteSalvo = null;
         _pacienteRepositoryMock
             .Setup(r => r.Adicionar(It.IsAny<Paciente>()))
@@ -51,13 +33,13 @@ public class AdicionarNovoPacienteTests
             .Returns(Task.CompletedTask);
 
         // Act - Agir
-        await _pacienteService.AdicionarNovoPaciente(paciente);
+        await _pacienteService.AdicionarNovoPaciente(pacienteFake);
 
         // Assert - Afirmar
         Assert.False(_notificador.TemNotificacao());
         Assert.NotNull(pacienteSalvo);
-        Assert.Equal(paciente.Nome, pacienteSalvo.Nome);
-        Assert.Equal(paciente.CPF, pacienteSalvo.CPF);
+        Assert.Equal(pacienteFake.Nome, pacienteSalvo.Nome);
+        Assert.Equal(pacienteFake.CPF, pacienteSalvo.CPF);
 
         _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Once);
     }
@@ -129,7 +111,7 @@ public class AdicionarNovoPacienteTests
     }
 
     [Fact]
-    public async Task AdicionarNovoPaciente_DeveNotificar_QuandoCPFNaoForAdicionado()
+    public async Task AdicionarNovoPaciente_DeveNotificar_QuandoCPFForVazio()
     {
         //Arrange - Organizar
         var cpfVazio = "";

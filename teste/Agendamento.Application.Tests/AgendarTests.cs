@@ -1,11 +1,11 @@
 ﻿using Agendamento.Application.DTOs;
 using Agendamento.Application.Services;
+using Agendamento.Application.Tests.Auxiliar;
+using Agendamento.Application.Tests.Services.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
-using Agendamento.Application.Tests.Services.Auxiliar;
-using Agendamento.Application.Tests.Auxiliar;
 namespace Agendamento.Application.Tests;
 public class AgendarTests
 {
