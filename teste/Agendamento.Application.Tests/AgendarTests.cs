@@ -9,24 +9,20 @@ using Moq;
 namespace Agendamento.Application.Tests;
 public class AgendarTests
 {
-    // 1. Definição dos Mocks necessários para construir a Service
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
     private readonly Mock<IAgendaRepository> _agendaRepositoryMock;
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly Mock<INotificador> _notificadorMock;
 
-    // O sistema sob teste (System Under Test)
     private readonly AgendaService _agendaService;
 
     public AgendarTests()
     {
-        // 2. Inicialização correta de todos os Mocks
         _pacienteRepositoryMock = new Mock<IPacienteRepository>();
         _agendaRepositoryMock = new Mock<IAgendaRepository>();
         _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificadorMock = new Mock<INotificador>();
 
-        // 3. Instanciação manual passando os objetos simulados (.Object)
         _agendaService = new AgendaService(
             _notificadorMock.Object,
             _agendaRepositoryMock.Object,
@@ -36,7 +32,7 @@ public class AgendarTests
     }
 
     [Fact]
-    public void Agendar_DeveCriarAgendamento_QuandoDadosForemValidos()
+    public async Task Agendar_DeveCriarAgendamento_QuandoDadosForemValidos()
     {
         // Arrange
         var agendaDto = new NovoAgendamentoDto
@@ -48,20 +44,56 @@ public class AgendarTests
             Observacao = "Consulta de rotina"
         };
 
+        var paciente = PacienteFixture.CriarPacienteFake(StatusPaciente.Ativo);
+        var profissional = ProfissionalFixture.CriarProfissionalFake();
+
+        _pacienteRepositoryMock
+            .Setup(r => r.ObterPorId(agendaDto.PacienteId))
+            .ReturnsAsync(paciente);
+
+        _profissionalRepositoryMock
+            .Setup(r => r.ObterPorId(agendaDto.ProfissionalId))
+            .ReturnsAsync(profissional);
+
+        _agendaRepositoryMock
+            .Setup(r => r.ExisteConflitoHorario(
+                agendaDto.ProfissionalId,
+                agendaDto.DataInicio,
+                agendaDto.DataFim))
+            .ReturnsAsync(false);
+
+        Agenda agendamentoSalvo = null;
+
+        _agendaRepositoryMock
+            .Setup(r => r.Adicionar(It.IsAny<Agenda>()))
+            .Callback<Agenda>(a => agendamentoSalvo = a)
+            .Returns(Task.CompletedTask);
+
+        _agendaRepositoryMock
+            .Setup(r => r.SaveChanges())
+            .ReturnsAsync(0);
+
         // Act
-        // Passando null nos campos de objeto complexo como você estruturou temporariamente
-        var agendamento = new Agenda(
-            agendaDto.PacienteId,
-            agendaDto.ProfissionalId,
-            StatusAgendamento.Agendado,
-            agendaDto.DataInicio,
-            agendaDto.DataFim,
-            agendaDto.Observacao,
-            null,
-            null);
+        await _agendaService.Agendar(agendaDto);
 
         // Assert
-        Assert.Equal(agendaDto.PacienteId, agendamento.PacienteId);
+        Assert.False(_notificadorMock.Object.TemNotificacao());
+
+        Assert.NotNull(agendamentoSalvo);
+        Assert.Equal(agendaDto.PacienteId, agendamentoSalvo.PacienteId);
+        Assert.Equal(agendaDto.ProfissionalId, agendamentoSalvo.ProfissionalId);
+        Assert.Equal(StatusAgendamento.Agendado, agendamentoSalvo.StatusAgendamento);
+        Assert.Equal(agendaDto.DataInicio, agendamentoSalvo.DataInicio);
+        Assert.Equal(agendaDto.DataFim, agendamentoSalvo.DataFim);
+        Assert.Equal(agendaDto.Observacao, agendamentoSalvo.Observacao);
+
+        _agendaRepositoryMock.Verify(
+            r => r.Adicionar(It.IsAny<Agenda>()),
+            Times.Once);
+
+        _agendaRepositoryMock.Verify(
+            r => r.SaveChanges(),
+            Times.Once);
     }
 
     [Fact]
@@ -84,7 +116,17 @@ public class AgendarTests
         await _agendaService.Agendar(agendaDto);
 
         // Assert 
-        _notificadorMock.Verify(n => n.Handle(It.Is<Notificacao>(notificacao => notificacao.Mensagem == "Paciente não encontrado.")), Times.Once);
+
+        _agendaRepositoryMock.Verify(
+            r => r.ExisteConflitoHorario(
+                It.IsAny<Guid>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>()),
+            Times.Never);
+
+        _agendaRepositoryMock.Verify(
+            r => r.Adicionar(It.IsAny<Agenda>()),
+            Times.Never);
     }
 
     [Fact]
@@ -126,9 +168,16 @@ public class AgendarTests
         await _agendaService.Agendar(agendaDto);
 
         // Assert - Afirmar
-        _notificadorMock.Verify(n => n.Handle(It.Is<Notificacao>(notificacao =>
-            notificacao.Mensagem == "Profissional não encontrado.")),
-            Times.Once);
+        _agendaRepositoryMock.Verify(
+            r => r.ExisteConflitoHorario(
+                It.IsAny<Guid>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>()),
+            Times.Never);
+
+        _agendaRepositoryMock.Verify(
+            r => r.Adicionar(It.IsAny<Agenda>()),
+            Times.Never);
     }
 
     [Fact]
@@ -166,6 +215,14 @@ public class AgendarTests
 
         // Assert - Afirmar
         _notificadorMock.Verify(n => n.Handle(It.Is<Notificacao>(notificacao => notificacao.Mensagem == "Paciente bloqueado. Não é possível realizar agendamento.")), Times.Once);
+
+        _agendaRepositoryMock.Verify(
+            r => r.Adicionar(It.IsAny<Agenda>()),
+            Times.Never);
+
+        _profissionalRepositoryMock.Verify(
+            r => r.ObterPorId(It.IsAny<Guid>()),
+            Times.Never);
     }
 
     [Fact]
@@ -197,5 +254,13 @@ public class AgendarTests
         _notificadorMock.Verify(n => n.Handle(It.Is<Notificacao>(notificacao =>
             notificacao.Mensagem == "O profissional já possui um agendamento neste horário.")),
             Times.Once);
+
+        _agendaRepositoryMock.Verify(
+            r => r.Adicionar(It.IsAny<Agenda>()),
+            Times.Never);
+
+        _agendaRepositoryMock.Verify(
+            r => r.SaveChanges(),
+            Times.Never);
     }
 }
