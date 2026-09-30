@@ -7,32 +7,29 @@ using Agendamento.Domain.Notificacoes;
 using Moq;
 
 namespace Agendamento.Application.Tests;
+
 public class RemoverProfissionalTests
 {
     private readonly Mock<IProfissionalRepository> _profissionalRepositoryMock;
     private readonly IProfissionalService _profissionalService;
     private readonly Notificador _notificador;
-    private readonly ProfissionalService profissionalService;
 
     public RemoverProfissionalTests()
     {
         _profissionalRepositoryMock = new Mock<IProfissionalRepository>();
         _notificador = new Notificador();
-        profissionalService = new ProfissionalService(_profissionalRepositoryMock.Object, _notificador);
 
-        _profissionalService = new ProfissionalService(_profissionalRepositoryMock.Object, _notificador);
-
+        _profissionalService = new ProfissionalService(
+            _profissionalRepositoryMock.Object,
+            _notificador);
     }
 
     [Fact]
-    public async Task RemoverProfissional_DeveRemover_QuandoProfissionalExistente()
+    public async Task RemoverProfissional_DeveRemover_QuandoProfissionalExistir()
     {
         // Arrange
         var profissional = ProfissionalFixture.CriarProfissionalFake();
         var profissionalId = profissional.Id;
-
-        var profissionalRepositoryMock = new Mock<IProfissionalRepository>();
-        var notificadorMock = new Mock<INotificador>();
 
         _profissionalRepositoryMock
             .Setup(r => r.ObterPorId(profissionalId))
@@ -43,11 +40,14 @@ public class RemoverProfissionalTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await profissionalService.RemoverProfissional(profissionalId);
+        await _profissionalService.RemoverProfissional(profissionalId);
 
         // Assert
         Assert.False(_notificador.TemNotificacao());
-        _profissionalRepositoryMock.Verify(r => r.Remover(profissionalId), Times.Once);
+
+        _profissionalRepositoryMock.Verify(
+            r => r.Remover(profissionalId),
+            Times.Once);
     }
 
     [Fact]
@@ -58,15 +58,21 @@ public class RemoverProfissionalTests
 
         _profissionalRepositoryMock
             .Setup(r => r.ObterPorId(idInexistente))
-            .ReturnsAsync((Profissional)null);
+            .ReturnsAsync((Profissional?)null);
 
         // Act
-        await profissionalService.RemoverProfissional(idInexistente);
+        await _profissionalService.RemoverProfissional(idInexistente);
 
         // Assert
-        Assert.True(_notificador.TemNotificacao());
-        Assert.Contains(_notificador.ObterNotificacoes(), n => n.Mensagem == "Profissional não encontrado.");
+        var notificacao = Assert.Single(
+            _notificador.ObterNotificacoes());
 
-        _profissionalRepositoryMock.Verify(r => r.Remover(It.IsAny<Guid>()), Times.Never);
+        Assert.Equal(
+            "Profissional não encontrado.",
+            notificacao.Mensagem);
+
+        _profissionalRepositoryMock.Verify(
+            r => r.Remover(It.IsAny<Guid>()),
+            Times.Never);
     }
 }

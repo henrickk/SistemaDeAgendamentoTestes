@@ -14,15 +14,10 @@ public class ProfissionalService : BaseService, IProfissionalService
 
     public async Task AdicionarNovoProfissional(Profissional profissional)
     {
-        var profissionalExistente = await _profissionalRepository.Buscar(p => p.CRO == profissional.CRO);
+        var profissionalExistente = await _profissionalRepository
+            .Buscar(p => p.CRO == profissional.CRO);
 
-        if (profissionalExistente == null)
-        {
-            Notificar("Profissional não encontrado.");
-            return;
-        }
-
-        if (profissionalExistente.Any())
+        if (profissionalExistente != null && profissionalExistente.Any())
         {
             Notificar("Já existe um profissional com este CRO.");
             return;
