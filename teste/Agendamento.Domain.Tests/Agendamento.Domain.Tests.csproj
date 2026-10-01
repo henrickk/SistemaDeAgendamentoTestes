@@ -20,4 +20,12 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Agendamento.Domain\Agendamento.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
