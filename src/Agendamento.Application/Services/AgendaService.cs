@@ -43,6 +43,22 @@ public class AgendaService : BaseService, IAgendaService
             return;
         }
 
+        var agendamento = new Agenda(
+            novoAgendamentoDto.PacienteId,
+            novoAgendamentoDto.ProfissionalId,
+            StatusAgendamento.Agendado,
+            novoAgendamentoDto.DataInicio,
+            novoAgendamentoDto.DataFim,
+            novoAgendamentoDto.Observacao,
+            null,
+            null);
+
+        if (!agendamento.DatasValidas())
+        {
+            Notificar("A data de início deve ser anterior à data de fim.");
+            return;
+        }
+
         var possuiConflito = await _agendaRepository.ExisteConflitoHorario(
             novoAgendamentoDto.ProfissionalId,
             novoAgendamentoDto.DataInicio,
@@ -54,16 +70,6 @@ public class AgendaService : BaseService, IAgendaService
             Notificar("O profissional já possui um agendamento neste horário.");
             return;
         }
-
-        var agendamento = new Agenda(
-        novoAgendamentoDto.PacienteId,
-        novoAgendamentoDto.ProfissionalId,
-        StatusAgendamento.Agendado,
-        novoAgendamentoDto.DataInicio,
-        novoAgendamentoDto.DataFim,
-        novoAgendamentoDto.Observacao,
-        null,
-        null);
 
         await _agendaRepository.Adicionar(agendamento);
         await _agendaRepository.SaveChanges();
@@ -197,6 +203,8 @@ public class AgendaService : BaseService, IAgendaService
         await _agendaRepository.Atualizar(agendamentoExistente);
         await _agendaRepository.SaveChanges();
     }
+
+
 
     public void Dispose()
     {

@@ -263,4 +263,57 @@ public class AgendarTests
             r => r.SaveChanges(),
             Times.Never);
     }
+
+    [Fact]
+    public void DatasValidas_DeveRetornarTrue_QuandoDataInicioForAnteriorADataFim()
+    {
+        // Arrange
+        var agenda = new Agenda
+        {
+            DataInicio = new DateTime(2026, 10, 1, 10, 0, 0),
+            DataFim = new DateTime(2026, 10, 1, 11, 0, 0)
+        };
+
+        // Act
+        var resultado = agenda.DatasValidas();
+
+        // Assert
+        Assert.True(resultado);
+    }
+
+    [Fact]
+    public void DatasValidas_DeveRetornarFalse_QuandoDataInicioForMaiorQueDataFim()
+    {
+        // Arrange
+        var agenda = new Agenda
+        {
+            DataInicio = new DateTime(2026, 10, 1, 11, 0, 0),
+            DataFim = new DateTime(2026, 10, 1, 10, 0, 0)
+        };
+
+        // Act
+        var resultado = agenda.DatasValidas();
+
+        // Assert
+        Assert.False(resultado);
+    }
+
+    [Fact]
+    public void DatasValidas_DeveRetornarFalse_QuandoDataInicioForIgualADataFim()
+    {
+        // Arrange
+        var data = new DateTime(2026, 10, 1, 10, 0, 0);
+
+        var agenda = new Agenda
+        {
+            DataInicio = data,
+            DataFim = data
+        };
+
+        // Act
+        var resultado = agenda.DatasValidas();
+
+        // Assert
+        Assert.False(resultado);
+    }
 }

@@ -1,4 +1,7 @@
-﻿namespace Agendamento.Domain.Models;
+﻿using Agendamento.Domain.Interfaces;
+
+
+namespace Agendamento.Domain.Models;
 
 public class Agenda : Entity
 {
@@ -25,11 +28,8 @@ public class Agenda : Entity
         Profissional = profissional;
     }
 
-    public void ValidarDatas()///////// Criar regras depois
+    public bool DatasValidas()
     {
-        if (DataInicio >= DataFim)
-        {
-            throw new ArgumentException("A data de início deve ser anterior à data de fim.");
-        }
+        return DataInicio < DataFim;
     }
 }
