@@ -82,7 +82,7 @@ public class PacienteRepository : IRepository<Paciente>, IPacienteRepository
 
     public async Task Remover(Guid id)
     {
-        var paciente = await ObterPorId(id);
+        var paciente = await _dbContext.Pacientes.FindAsync(id);
         if (paciente != null)
         {
             _dbContext.Pacientes.Remove(paciente);

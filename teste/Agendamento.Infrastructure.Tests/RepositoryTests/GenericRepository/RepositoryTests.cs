@@ -1,10 +1,11 @@
 using Agendamento.Domain.Models;
 using Agendamento.Infrastructure.Context;
 using Agendamento.Infrastructure.Repository;
+using Agendamento.Infrastructure.Tests.RepositoryTests.Auxiliar;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace Agendamento.Infrastructure.Tests.Repository;
+namespace Agendamento.Infrastructure.Tests.RepositoryTests.GenericRepository;
 
 public class RepositoryTests : IDisposable
 {
@@ -186,7 +187,8 @@ public class RepositoryTests : IDisposable
         var resultado = await _repository.SaveChanges();
 
         // Assert
-        Assert.Equal(1, resultado);
+        // Paciente, Contato e Endereco são persistidos como entradas distintas pelo EF Core.
+        Assert.Equal(3, resultado);
 
         var pacienteSalvo = await _context.Set<Paciente>()
             .FindAsync(paciente.Id);
