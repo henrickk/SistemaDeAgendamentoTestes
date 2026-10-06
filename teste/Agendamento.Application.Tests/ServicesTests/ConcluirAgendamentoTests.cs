@@ -4,12 +4,11 @@ using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 
-namespace Agendamento.Application.Tests;
-
-public class CancelarAgendamentoTests
+namespace Agendamento.Application.Tests.ServiceTests;
+public class ConcluirAgendamentoTests
 {
     [Fact]
-    public async Task CancelarAgendamento_DeveAlterarStatusParaCancelado_QuandoAgendamentoExistir()
+    public async Task ConcluirAgendamento_DeveAlterarStatusParaConcluido_QuandoAgendamentoExistir()
     {
         // Arrange
         var agendamentoId = Guid.NewGuid();
@@ -47,11 +46,11 @@ public class CancelarAgendamentoTests
         );
 
         // Act
-        await agendaService.CancelarAgendamento(agendamentoId);
+        await agendaService.ConcluirAgendamento(agendamentoId);
 
         // Assert
         Assert.Equal(
-            StatusAgendamento.Cancelado,
+            StatusAgendamento.Concluido,
             agendamento.StatusAgendamento);
 
         agendaRepositoryMock.Verify(
@@ -64,7 +63,7 @@ public class CancelarAgendamentoTests
     }
 
     [Fact]
-    public async Task CancelarAgendamento_DeveNotificar_QuandoAgendamentoNaoExistir()
+    public async Task ConcluirAgendamento_DeveNotificar_QuandoAgendamentoNaoExistir()
     {
         // Arrange
         var agendamentoId = Guid.NewGuid();
@@ -84,7 +83,7 @@ public class CancelarAgendamentoTests
         );
 
         // Act
-        await agendaService.CancelarAgendamento(agendamentoId);
+        await agendaService.ConcluirAgendamento(agendamentoId);
 
         // Assert
         notificadorMock.Verify(
@@ -102,7 +101,7 @@ public class CancelarAgendamentoTests
     }
 
     [Fact]
-    public async Task CancelarAgendamento_DeveNotificar_QuandoAgendamentoJaEstiverCancelado()
+    public async Task ConcluirAgendamento_DeveNotificar_QuandoAgendamentoJaEstiverConcluido()
     {
         // Arrange
         var agendamentoId = Guid.NewGuid();
@@ -110,7 +109,7 @@ public class CancelarAgendamentoTests
         var agendamento = new Agenda(
             Guid.NewGuid(),
             Guid.NewGuid(),
-            StatusAgendamento.Cancelado,
+            StatusAgendamento.Concluido,
             DateTime.Now.AddHours(1),
             DateTime.Now.AddHours(2),
             "Consulta de rotina",
@@ -132,12 +131,12 @@ public class CancelarAgendamentoTests
         );
 
         // Act
-        await agendaService.CancelarAgendamento(agendamentoId);
+        await agendaService.ConcluirAgendamento(agendamentoId);
 
         // Assert
         notificadorMock.Verify(
             n => n.Handle(It.Is<Notificacao>(notificacao =>
-                notificacao.Mensagem == "O agendamento já está cancelado.")),
+                notificacao.Mensagem == "O agendamento já está concluído.")),
             Times.Once);
 
         agendaRepositoryMock.Verify(

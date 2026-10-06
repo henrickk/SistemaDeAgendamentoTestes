@@ -5,7 +5,7 @@ using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 
-namespace Agendamento.Application.Tests;
+namespace Agendamento.Application.Tests.ServiceTests;
 
 public class AtualizarAgendamentoTests
 {

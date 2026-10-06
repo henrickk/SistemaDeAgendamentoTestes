@@ -1,11 +1,11 @@
 ﻿using Agendamento.Application.Services;
-using Agendamento.Application.Tests.Services.Auxiliar;
+using Agendamento.Application.Tests.ServiceTests.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 
-namespace Agendamento.Application.Tests;
+namespace Agendamento.Application.Tests.ServiceTests;
 public class AdicionarNovoPacienteTests
 {
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;
@@ -43,8 +43,6 @@ public class AdicionarNovoPacienteTests
 
         _pacienteRepositoryMock.Verify(r => r.Adicionar(It.IsAny<Paciente>()), Times.Once);
     }
-
-
 
     [Fact]
     public async Task AdicionarNovoPaciente_DeveNotificar_QuandoNomeForVazio()

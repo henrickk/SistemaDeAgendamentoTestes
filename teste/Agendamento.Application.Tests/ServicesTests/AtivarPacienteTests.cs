@@ -1,11 +1,11 @@
 ﻿using Agendamento.Application.Services;
-using Agendamento.Application.Tests.Services.Auxiliar;
+using Agendamento.Application.Tests.ServiceTests.Auxiliar;
 using Agendamento.Domain.Interfaces;
 using Agendamento.Domain.Models;
 using Agendamento.Domain.Notificacoes;
 using Moq;
 
-namespace Agendamento.Application.Tests;
+namespace Agendamento.Application.Tests.ServiceTests;
 public class AtivarPacienteTests
 {
     private readonly Mock<IPacienteRepository> _pacienteRepositoryMock;

@@ -1,6 +1,6 @@
 ﻿using Agendamento.Domain.Models;
 
-namespace Agendamento.Application.Tests.Services.Auxiliar;
+namespace Agendamento.Application.Tests.ServiceTests.Auxiliar;
 
 public static class PacienteFixture
 {
